@@ -9,10 +9,13 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack-dev-server --open --config ./config/webpack.dev.js",
-    "build": "webpack --config ./config/webpack.prod.js"
+    "build": "webpack --config ./config/webpack.prod.js",
+    "docs:dev": "vuepress dev docs",
+    "docs:build": "vuepress build docs"
   },
   "devDependencies": {
     "html-webpack-plugin": "^3.2.0",
+    "markdown-it-katex": "^2.0.3",
     "raw-loader": "^0.5.1",
     "vuepress": "^0.8.4",
     "webpack": "^4.7.0",
