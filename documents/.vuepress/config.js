@@ -1,6 +1,7 @@
 module.exports = {
   title: 'Learn WebGL',
   description: 'Learn WebGL step by step.',
+  dest: 'docs',
   host: 'localhost',
   port: 8000,
   markdown: {

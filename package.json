@@ -10,8 +10,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack-dev-server --open --config ./config/webpack.dev.js",
     "build": "webpack --config ./config/webpack.prod.js",
-    "docs:dev": "vuepress dev docs",
-    "docs:build": "vuepress build docs"
+    "docs:dev": "vuepress dev documents",
+    "docs:build": "vuepress build documents"
   },
   "devDependencies": {
     "html-webpack-plugin": "^3.2.0",
