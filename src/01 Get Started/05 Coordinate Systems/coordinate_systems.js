@@ -1,6 +1,8 @@
+import * as glm from 'gl-matrix';
+
 import Shader from './../../shader'
-import vsSource from './texture.vs'
-import fsSource from './texture.fs'
+import vsSource from './coordinate_systems.vs'
+import fsSource from './coordinate_systems.fs'
 
 import wall from './../../assets/wall.jpg'
 import Avatar from './../../assets/Avatar.png'
@@ -11,6 +13,12 @@ async function init(){
     let canvas = document.createElement('canvas')
     canvas.width = window.innerWidth
     canvas.height = window.innerHeight
+    window.onresize = function(){
+        canvas.width = window.innerWidth
+        canvas.height = window.innerHeight
+        gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+        drawScene()
+    }
     document.body.appendChild(canvas)
 
     let gl = canvas.getContext('webgl')
@@ -75,7 +83,6 @@ async function init(){
 
     animate()
 
-
     function drawScene() {
         gl.clearColor(0.0, 0.5, 1.0, 1.0)
         gl.clear(gl.COLOR_BUFFER_BIT)
@@ -85,10 +92,21 @@ async function init(){
         gl.activeTexture(gl.TEXTURE1)
         gl.bindTexture(gl.TEXTURE_2D, texture2)
 
+        let model = glm.mat4.create()
+        let view = glm.mat4.create()
+        let projection = glm.mat4.create()
+        glm.mat4.rotate(model, model, glm.glMatrix.toRadian(-55.0), glm.vec3.fromValues(1.0, 0.0, 0.0))
+        glm.mat4.translate(view, view, glm.vec3.fromValues(0.0, 0.0, -3.0))
+        glm.mat4.perspective(projection, glm.glMatrix.toRadian(45.0), gl.canvas.clientWidth/gl.canvas.clientHeight, 0.1, 100)
+
         shader.use()
+
+        shader.setMat4('model', model)
+        shader.setMat4('view', view)
+        shader.setMat4('projection', projection)
+
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, EBO)
         gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_BYTE, 0)
-
     }
 
     function animate() {

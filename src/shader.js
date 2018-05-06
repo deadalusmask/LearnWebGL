@@ -25,13 +25,25 @@ export default class Shader {
     }
 
     setBool(name,value) {
-        this.gl.uniform1i(this.gl.getUniformLocation(this.Program, name), Number(value));
+        this.gl.uniform1i(this.gl.getUniformLocation(this.Program, name), Number(value))
     }
     setInt(name,value) {
-        this.gl.uniform1i(this.gl.getUniformLocation(this.Program, name), Number(value));
+        this.gl.uniform1i(this.gl.getUniformLocation(this.Program, name), Number(value))
     }
     setFloat(name,value) {
-        this.gl.uniform1f(this.gl.getUniformLocation(this.Program, name), Number(value));
+        this.gl.uniform1f(this.gl.getUniformLocation(this.Program, name), Number(value))
+    }
+    setVec3(name,x,y,z) {
+        this.gl.uniform3f(this.gl.getUniformLocation(this.Program, name), Number(x), Number(y), Number(z))
+    }
+    setVec4(name,x,y,z,w) {
+        this.gl.uniform4f(this.gl.getUniformLocation(this.Program, name), Number(x), Number(y), Number(z), Number(w))
+    }
+    setMat3(name, mat3) {
+        this.gl.uniformMatrix3fv(this.gl.getUniformLocation(this.Program, name), false, mat3)
+    }
+    setMat4(name, mat4) {
+        this.gl.uniformMatrix4fv(this.gl.getUniformLocation(this.Program, name), false, mat4)
     }
 }
 

@@ -13,6 +13,9 @@
     "docs:dev": "vuepress dev documents",
     "docs:build": "vuepress build documents"
   },
+  "dependencies": {
+    "gl-matrix": "^2.5.1"
+  },
   "devDependencies": {
     "html-webpack-plugin": "^3.2.0",
     "markdown-it-katex": "^2.0.3",

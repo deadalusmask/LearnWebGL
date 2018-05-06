@@ -1,38 +1,25 @@
 import * as glm from 'gl-matrix';
 
 import Shader from './shader'
-import vsSource from './01 Get Started/05 Coordinate Systems/coordinate_systems.vs'
-import fsSource from './01 Get Started/05 Coordinate Systems/coordinate_systems.fs'
+import vsSource from '../05 Coordinate Systems/coordinate_systems.vs'
+import fsSource from '../05 Coordinate Systems/coordinate_systems.fs'
 
-import wall from './assets/wall.jpg'
-import Avatar from './assets/Avatar.png'
+import wall from './../../assets/wall.jpg'
+import Avatar from './../../assets/Avatar.png'
 
 async function init(){
+
+    let cameraPos = glm.vec3.fromValues(0.0, 0.0, 3.0)
+    let cameraFront = glm.vec3.fromValues(0.0, 0.0, -1.0)
+    let cameraUp = glm.vec3.fromValues(0.0, 1.0, 0.0)
+    let deltaTime = 0.0 // time between current frame and last fram
+    let lastFrame = 0.0
+
     document.body.style.margin = 0
     document.body.style.overflow = 'hidden'
     let canvas = document.createElement('canvas')
     canvas.width = window.innerWidth
     canvas.height = window.innerHeight
-    document.body.appendChild(canvas)
-
-    // camera
-    let cameraPos = glm.vec3.fromValues(0.0, 0.0, 3.0)
-    let cameraFront = glm.vec3.fromValues(0.0, 0.0, -1.0)
-    let cameraUp = glm.vec3.fromValues(0.0, 1.0, 0.0)
-
-    let yaw   = -90.0 // yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
-    let pitch =  0.0
-    let lastX =  canvas.width / 2.0
-    let lastY =  canvas.height / 2.0
-    let fov   =  45.0
-
-    // timting
-    let deltaTime = 0.0 // time between current frame and last fram
-    let lastFrame = 0.0
-
-
-
-    // resize window
     window.onresize = function(){
         canvas.width = window.innerWidth
         canvas.height = window.innerHeight
@@ -40,57 +27,19 @@ async function init(){
         drawScene()
     }
 
-    //capture keyboard input
+    //capture input
     let currentlyPressedKeys = {}
-
-
-
-    //capture cursor
-    canvas.requestPointerLock = canvas.requestPointerLock ||
-                            canvas.mozRequestPointerLock
-    document.exitPointerLock = document.exitPointerLock ||
-                            document.mozExitPointerLock
-    canvas.onclick = function() {
-        canvas.requestPointerLock()
-    }
-
-    document.addEventListener('pointerlockchange', handleLockChange, false);
-    document.addEventListener('mozpointerlockchange', handleLockChange, false);
-
-    function handleLockChange() {
-        if (document.pointerLockElement === canvas ||
-            document.mozPointerLockElement === canvas) {
-            console.log('The pointer lock status is now locked')
-            document.addEventListener('keydown', handleKeyDown)
-            document.addEventListener('keyup', handleKeyUp)
-            document.addEventListener('mousemove', mouse_callback)
-            document.addEventListener('wheel', wheel_callback)
-        } else {
-            console.log('The pointer lock status is now unlocked')
-            document.removeEventListener('mousemove', mouse_callback)
-            document.removeEventListener('wheel', wheel_callback)
-            document.removeEventListener('keydown', handleKeyDown)
-            document.removeEventListener('keyup', handleKeyUp)
-        }
-    }
-
-    function handleKeyDown(event) {
+    document.onkeydown = function(event){
         currentlyPressedKeys[event.key] = true
     }
-    function handleKeyUp(event) {
-        currentlyPressedKeys[event.key] = false
+    document.onkeyup = function(event){
+        currentlyPressedKeys[event.key] = false;
     }
-    // document.addEventListener('pointerlockchange', lockChange, false)
-    // document.addEventListener('mozpointerlockchange', lockChange, false)
 
-
-
-
-
-
+    document.body.appendChild(canvas)
     let gl = canvas.getContext('webgl')
     if (!gl) {
-        console.error('Unable to initialize WebGL. Your browser or machine may not support it.')
+        console.error("Unable to initialize WebGL. Your browser or machine may not support it.")
         return
     }
     gl.enable(gl.DEPTH_TEST)
@@ -187,6 +136,12 @@ async function init(){
     shader.setInt('texture1', 0)
     shader.setInt('texture2', 1)
 
+    // pass projection matrix to shader (as projection matrix rarely changes there's no need to do this per frame)
+    let projection = glm.mat4.create()
+    glm.mat4.perspective(projection, glm.glMatrix.toRadian(45.0), gl.canvas.clientWidth/gl.canvas.clientHeight, 0.1, 100)
+
+
+
     animate()
 
     function drawScene() {
@@ -201,11 +156,14 @@ async function init(){
         shader.use()
 
         let view = glm.mat4.create()
+        let radius = 10.0
+        let camX = Math.sin(Date.now() * 0.001) * radius
+        let camZ = Math.cos(Date.now() * 0.001) * radius
+
         let center = glm.vec3.create()
         glm.vec3.add(center, cameraPos, cameraFront)
         glm.mat4.lookAt(view, cameraPos, center, cameraUp)
-        let projection = glm.mat4.create()
-        glm.mat4.perspective(projection, glm.glMatrix.toRadian(fov), gl.canvas.clientWidth/gl.canvas.clientHeight, 0.1, 100)
+
         shader.setMat4('view', view)
         shader.setMat4('projection', projection)
 
@@ -259,37 +217,6 @@ async function init(){
         }
 
     }
-
-    function mouse_callback(e) {
-        let sensitivity = 0.05
-        let xoffset = e.movementX
-        let yoffset = -e.movementY
-
-        yaw += xoffset * sensitivity
-        pitch +=  yoffset * sensitivity
-
-        if (pitch > 89.0)
-            pitch = 89.0
-        if (pitch < -89.0)
-            pitch = -89.0
-
-        let front =  glm.vec3.create()
-        front[0] = Math.cos(glm.glMatrix.toRadian(yaw)) * Math.cos(glm.glMatrix.toRadian(pitch))
-        front[1] = Math.sin(glm.glMatrix.toRadian(pitch))
-        front[2] = Math.sin(glm.glMatrix.toRadian(yaw)) * Math.cos(glm.glMatrix.toRadian(pitch))
-        glm.vec3.normalize(cameraFront, front)
-    }
-
-    function wheel_callback(e) {
-        console.log(e.wheelDeltaY)
-        if (fov >= 1.0 && fov <= 45.0)
-            fov -= e.wheelDeltaY/200
-        if (fov <= 1.0)
-            fov = 1.0
-        if (fov >= 45.0)
-            fov = 45.0
-    }
-
 }
 
 function loadImage(src){

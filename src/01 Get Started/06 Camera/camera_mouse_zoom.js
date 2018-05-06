@@ -1,11 +1,11 @@
 import * as glm from 'gl-matrix';
 
-import Shader from './shader'
-import vsSource from './01 Get Started/05 Coordinate Systems/coordinate_systems.vs'
-import fsSource from './01 Get Started/05 Coordinate Systems/coordinate_systems.fs'
+import Shader from './../../shader'
+import vsSource from './../05 Coordinate Systems/coordinate_systems.vs'
+import fsSource from './../05 Coordinate Systems/coordinate_systems.fs'
 
-import wall from './assets/wall.jpg'
-import Avatar from './assets/Avatar.png'
+import wall from './../../assets/wall.jpg'
+import Avatar from './../../assets/Avatar.png'
 
 async function init(){
     document.body.style.margin = 0

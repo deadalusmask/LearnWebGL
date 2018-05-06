@@ -1,6 +1,8 @@
+import * as glm from 'gl-matrix';
+
 import Shader from './../../shader'
-import vsSource from './texture.vs'
-import fsSource from './texture.fs'
+import vsSource from './transform.vs'
+import fsSource from './transform.fs'
 
 import wall from './../../assets/wall.jpg'
 import Avatar from './../../assets/Avatar.png'
@@ -75,7 +77,6 @@ async function init(){
 
     animate()
 
-
     function drawScene() {
         gl.clearColor(0.0, 0.5, 1.0, 1.0)
         gl.clear(gl.COLOR_BUFFER_BIT)
@@ -85,10 +86,16 @@ async function init(){
         gl.activeTexture(gl.TEXTURE1)
         gl.bindTexture(gl.TEXTURE_2D, texture2)
 
+        let transform = glm.mat4.create()
+        glm.mat4.translate(transform, transform, glm.vec3.fromValues(0.5, -0.5, 0.0))
+        glm.mat4.rotate(transform, transform, glm.glMatrix.toRadian(Date.now() * 0.05), glm.vec3.fromValues(0.0, 0.0, 1.0))
+
         shader.use()
+
+        shader.setMat4('uTransform', transform)
+
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, EBO)
         gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_BYTE, 0)
-
     }
 
     function animate() {
