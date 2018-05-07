@@ -4,12 +4,14 @@ const CameraMovement = Object.freeze({
     FORWARD: 1,
     BACKWARD: 2,
     LEFT: 3,
-    RIGHT: 4
+    RIGHT: 4,
+    UP: 5,
+    DOWN: 6
 })
 
 const YAW = -90.0
 const PITCH = 0.0
-const SPEED = 0.01
+const SPEED = 0.005
 const SENSITIVITY = 0.1
 const ZOOM = 45.0
 
@@ -64,6 +66,14 @@ class Camera {
         if(direction == CameraMovement.RIGHT){
             glm.vec3.scale(temp1, this.right, velocity)
             glm.vec3.add(this.position, this.position, temp1)
+        }
+        if(direction == CameraMovement.UP){
+            glm.vec3.scale(temp1, this.up, velocity)
+            glm.vec3.add(this.position, this.position, temp1)
+        }
+        if(direction == CameraMovement.DOWN){
+            glm.vec3.scale(temp1, this.up, velocity)
+            glm.vec3.sub(this.position, this.position, temp1)
         }
     }
 

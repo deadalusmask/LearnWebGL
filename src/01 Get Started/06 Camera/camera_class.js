@@ -19,8 +19,6 @@ async function init(){
 
     // camera
     let camera = new Camera(glm.vec3.fromValues(0.0,  0.0, 3.0))
-    let lastX =  canvas.width / 2.0
-    let lastY =  canvas.height / 2.0
 
     // timting
     let deltaTime = 0
@@ -36,8 +34,6 @@ async function init(){
 
     //capture keyboard input
     let currentlyPressedKeys = {}
-
-
 
     //capture cursor
     canvas.requestPointerLock = canvas.requestPointerLock ||
@@ -229,6 +225,12 @@ async function init(){
         }
         if(currentlyPressedKeys['d']){
             camera.processKeyboard(Camera.Movement.RIGHT, deltaTime)
+        }
+        if(currentlyPressedKeys[' ']){
+            camera.processKeyboard(Camera.Movement.UP, deltaTime)
+        }
+        if(currentlyPressedKeys['Control']){
+            camera.processKeyboard(Camera.Movement.DOWN, deltaTime)
         }
 
     }

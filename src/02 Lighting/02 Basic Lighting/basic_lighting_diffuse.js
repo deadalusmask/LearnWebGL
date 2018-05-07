@@ -1,11 +1,11 @@
 import * as glm from 'gl-matrix';
 
-import Camera from './camera'
-import Shader from './shader'
-import vsSource from './02 Lighting/02 Basic Lighting/basic_lighting.vs'
-import fsSource from './02 Lighting/02 Basic Lighting/basic_lighting2.fs'
-import lampVsSource from './02 Lighting/01 Colors/lamp.vs'
-import lampFsSource from './02 Lighting/01 Colors/lamp.fs'
+import Camera from './../../camera'
+import Shader from './../../shader'
+import vsSource from './basic_lighting.vs'
+import fsSource from './basic_lighting.fs'
+import lampVsSource from './../01 Colors/lamp.vs'
+import lampFsSource from './../01 Colors/lamp.fs'
 
 
 async function init(){
@@ -36,6 +36,7 @@ async function init(){
 
     //capture keyboard input
     let currentlyPressedKeys = {}
+
 
 
     //capture cursor
@@ -152,7 +153,6 @@ async function init(){
         shader.setVec3('objectColor', glm.vec3.fromValues(1.0, 0.5, 0.3))
         shader.setVec3('lightColor', glm.vec3.fromValues(1.0, 1.0, 1.0))
         shader.setVec3('lightPos', lightPos)
-        shader.setVec3("viewPos", camera.position)
 
         let view = camera.getViewMatrix()
         shader.setMat4('view', view)
@@ -162,7 +162,7 @@ async function init(){
         shader.setMat4('projection', projection)
 
         let model = glm.mat4.create()
-        //glm.mat4.rotate(model, model, glm.glMatrix.toRadian(Date.now()*0.03), glm.vec3.fromValues(0.1, 0.3, 0.5))
+        glm.mat4.rotate(model, model, glm.glMatrix.toRadian(Date.now()*0.03), glm.vec3.fromValues(0.1, 0.3, 0.5))
         shader.setMat4('model', model)
 
         let normalMatrix = glm.mat3.create()

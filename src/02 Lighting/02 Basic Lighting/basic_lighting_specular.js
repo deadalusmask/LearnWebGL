@@ -1,11 +1,11 @@
 import * as glm from 'gl-matrix';
 
-import Camera from './camera'
-import Shader from './shader'
-import vsSource from './02 Lighting/02 Basic Lighting/basic_lighting.vs'
-import fsSource from './02 Lighting/02 Basic Lighting/basic_lighting2.fs'
-import lampVsSource from './02 Lighting/01 Colors/lamp.vs'
-import lampFsSource from './02 Lighting/01 Colors/lamp.fs'
+import Camera from './../../camera'
+import Shader from './../../shader'
+import vsSource from './basic_lighting.vs'
+import fsSource from './basic_lighting2.fs'
+import lampVsSource from './../01 Colors/lamp.vs'
+import lampFsSource from './../01 Colors/lamp.fs'
 
 
 async function init(){

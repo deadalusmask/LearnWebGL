@@ -33,11 +33,11 @@ export default class Shader {
     setFloat(name,value) {
         this.gl.uniform1f(this.gl.getUniformLocation(this.Program, name), Number(value))
     }
-    setVec3(name,x,y,z) {
-        this.gl.uniform3f(this.gl.getUniformLocation(this.Program, name), Number(x), Number(y), Number(z))
+    setVec3(name, vec3) {
+        this.gl.uniform3fv(this.gl.getUniformLocation(this.Program, name), vec3)
     }
-    setVec4(name,x,y,z,w) {
-        this.gl.uniform4f(this.gl.getUniformLocation(this.Program, name), Number(x), Number(y), Number(z), Number(w))
+    setVec4(name, vec4) {
+        this.gl.uniform4fv(this.gl.getUniformLocation(this.Program, name), vec4)
     }
     setMat3(name, mat3) {
         this.gl.uniformMatrix3fv(this.gl.getUniformLocation(this.Program, name), false, mat3)
