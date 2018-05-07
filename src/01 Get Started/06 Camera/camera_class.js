@@ -1,11 +1,13 @@
 import * as glm from 'gl-matrix';
 
+import Camera from './../../camera'
 import Shader from './../../shader'
 import vsSource from './../05 Coordinate Systems/coordinate_systems.vs'
 import fsSource from './../05 Coordinate Systems/coordinate_systems.fs'
 
 import wall from './../../assets/wall.jpg'
 import Avatar from './../../assets/Avatar.png'
+
 
 async function init(){
     document.body.style.margin = 0
@@ -16,17 +18,13 @@ async function init(){
     document.body.appendChild(canvas)
 
     // camera
-    let cameraPos = glm.vec3.fromValues(0.0, 0.0, 3.0)
-    let cameraFront = glm.vec3.fromValues(0.0, 0.0, -1.0)
-    let cameraUp = glm.vec3.fromValues(0.0, 1.0, 0.0)
-
-    let yaw   = -90.0 // yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
-    let pitch =  0.0
-    let fov   =  45.0
+    let camera = new Camera(glm.vec3.fromValues(0.0,  0.0, 3.0))
+    let lastX =  canvas.width / 2.0
+    let lastY =  canvas.height / 2.0
 
     // timting
-    let deltaTime = 0.0 // time between current frame and last fram
-    let lastFrame = 0.0
+    let deltaTime = 0
+    let lastFrame = 0
 
     // resize window
     window.onresize = function(){
@@ -38,6 +36,7 @@ async function init(){
 
     //capture keyboard input
     let currentlyPressedKeys = {}
+
 
 
     //capture cursor
@@ -189,13 +188,11 @@ async function init(){
 
         shader.use()
 
-        let view = glm.mat4.create()
-        let center = glm.vec3.create()
-        glm.vec3.add(center, cameraPos, cameraFront)
-        glm.mat4.lookAt(view, cameraPos, center, cameraUp)
-        let projection = glm.mat4.create()
-        glm.mat4.perspective(projection, glm.glMatrix.toRadian(fov), gl.canvas.clientWidth/gl.canvas.clientHeight, 0.1, 100)
+        let view = camera.getViewMatrix()
         shader.setMat4('view', view)
+
+        let projection = glm.mat4.create()
+        glm.mat4.perspective(projection, glm.glMatrix.toRadian(camera.zoom), gl.canvas.clientWidth/gl.canvas.clientHeight, 0.1, 100)
         shader.setMat4('projection', projection)
 
         cubePositions.forEach((element, index)=>{
@@ -220,63 +217,31 @@ async function init(){
     }
 
     function processInput() {
-        let cameraSpeed = 0.01 * deltaTime
-        let temp1 = glm.vec3.create()
+
         if(currentlyPressedKeys['w']){
-            glm.vec3.scale(temp1, cameraFront, cameraSpeed)
-            glm.vec3.add(cameraPos, cameraPos, temp1)
-            // cameraPos += cameraSpeed * cameraFront;
+            camera.processKeyboard(Camera.Movement.FORWARD, deltaTime)
         }
         if(currentlyPressedKeys['s']){
-            glm.vec3.scale(temp1, cameraFront, cameraSpeed)
-            glm.vec3.sub(cameraPos, cameraPos, temp1)
-            // cameraPos -= cameraSpeed * cameraFront;
+            camera.processKeyboard(Camera.Movement.BACKWARD, deltaTime)
         }
         if(currentlyPressedKeys['a']){
-            glm.vec3.cross(temp1, cameraFront, cameraUp)
-            glm.vec3.normalize(temp1, temp1)
-            glm.vec3.scale(temp1, temp1, cameraSpeed)
-            glm.vec3.sub(cameraPos, cameraPos, temp1)
-            // cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+            camera.processKeyboard(Camera.Movement.LEFT, deltaTime)
         }
         if(currentlyPressedKeys['d']){
-            glm.vec3.cross(temp1, cameraFront, cameraUp)
-            glm.vec3.normalize(temp1, temp1)
-            glm.vec3.scale(temp1, temp1, cameraSpeed)
-            glm.vec3.add(cameraPos, cameraPos, temp1)
-            // cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+            camera.processKeyboard(Camera.Movement.RIGHT, deltaTime)
         }
 
     }
 
     function mouse_callback(e) {
-        let sensitivity = 0.05
         let xoffset = e.movementX
         let yoffset = -e.movementY
-
-        yaw += xoffset * sensitivity
-        pitch +=  yoffset * sensitivity
-
-        if (pitch > 89.0)
-            pitch = 89.0
-        if (pitch < -89.0)
-            pitch = -89.0
-
-        let front =  glm.vec3.create()
-        front[0] = Math.cos(glm.glMatrix.toRadian(yaw)) * Math.cos(glm.glMatrix.toRadian(pitch))
-        front[1] = Math.sin(glm.glMatrix.toRadian(pitch))
-        front[2] = Math.sin(glm.glMatrix.toRadian(yaw)) * Math.cos(glm.glMatrix.toRadian(pitch))
-        glm.vec3.normalize(cameraFront, front)
+        camera.processMouseMovement(xoffset, yoffset)
     }
 
     function wheel_callback(e) {
-        console.log(e.wheelDeltaY)
-        if (fov >= 1.0 && fov <= 45.0)
-            fov -= e.wheelDeltaY/200
-        if (fov <= 1.0)
-            fov = 1.0
-        if (fov >= 45.0)
-            fov = 45.0
+        //console.log(e.wheelDeltaY)
+        camera.processMouseScroll(e.wheelDeltaY)
     }
 
 }

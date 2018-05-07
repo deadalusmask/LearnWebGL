@@ -156,10 +156,6 @@ async function init(){
         shader.use()
 
         let view = glm.mat4.create()
-        let radius = 10.0
-        let camX = Math.sin(Date.now() * 0.001) * radius
-        let camZ = Math.cos(Date.now() * 0.001) * radius
-
         let center = glm.vec3.create()
         glm.vec3.add(center, cameraPos, cameraFront)
         glm.mat4.lookAt(view, cameraPos, center, cameraUp)
@@ -177,8 +173,8 @@ async function init(){
         })
     }
 
-    function animate() {
-        let currentFrame = Date.now()
+    function animate(timeStamp) {
+        let currentFrame = timeStamp
         deltaTime = currentFrame - lastFrame
         lastFrame = currentFrame
 
