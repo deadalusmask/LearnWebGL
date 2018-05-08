@@ -1,4 +1,4 @@
-import * as glm from 'gl-matrix';
+import * as glm from 'gl-matrix'
 
 import Camera from './../../camera'
 import Shader from './../../shader'
@@ -30,7 +30,7 @@ async function init(){
     window.onresize = function(){
         canvas.width = window.innerWidth
         canvas.height = window.innerHeight
-        gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+        gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
         drawScene()
     }
 
@@ -47,8 +47,8 @@ async function init(){
         canvas.requestPointerLock()
     }
 
-    document.addEventListener('pointerlockchange', handleLockChange, false);
-    document.addEventListener('mozpointerlockchange', handleLockChange, false);
+    document.addEventListener('pointerlockchange', handleLockChange, false)
+    document.addEventListener('mozpointerlockchange', handleLockChange, false)
 
     function handleLockChange() {
         if (document.pointerLockElement === canvas ||

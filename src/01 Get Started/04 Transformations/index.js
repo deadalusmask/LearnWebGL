@@ -1,4 +1,4 @@
-import * as glm from 'gl-matrix';
+import * as glm from 'gl-matrix'
 
 import Shader from './../../shader'
 import vsSource from './transform.vs'

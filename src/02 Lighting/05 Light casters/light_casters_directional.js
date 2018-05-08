@@ -2,12 +2,13 @@ import * as glm from 'gl-matrix'
 
 import Camera from './../../camera'
 import Shader from './../../shader'
-import vsSource from './../05 Coordinate Systems/coordinate_systems.vs'
-import fsSource from './../05 Coordinate Systems/coordinate_systems.fs'
+import vsSource from './../04 Lighting maps/lighting_maps.vs'
+import fsSource from './light_casters_directional.fs'
+import lampVsSource from './../01 Colors/lamp.vs'
+import lampFsSource from './../01 Colors/lamp.fs'
 
-import wall from './../../assets/wall.jpg'
-import Avatar from './../../assets/Avatar.png'
-
+import box from './../../assets/box.png'
+import box_specular from './../../assets/box_specular.png'
 
 async function init(){
     document.body.style.margin = 0
@@ -18,11 +19,14 @@ async function init(){
     document.body.appendChild(canvas)
 
     // camera
-    let camera = new Camera(glm.vec3.fromValues(0.0,  0.0, 3.0))
+    let camera = new Camera(glm.vec3.fromValues(0.0,  0.0, 5.0))
 
     // timting
     let deltaTime = 0
     let lastFrame = 0
+
+    // lighting
+    // let lightPos = glm.vec3.fromValues(1.2, 1.0, 2.0)
 
     // resize window
     window.onresize = function(){
@@ -34,6 +38,7 @@ async function init(){
 
     //capture keyboard input
     let currentlyPressedKeys = {}
+
 
     //capture cursor
     canvas.requestPointerLock = canvas.requestPointerLock ||
@@ -80,51 +85,53 @@ async function init(){
     gl.enable(gl.DEPTH_TEST)
 
     let shader = new Shader(gl, vsSource, fsSource)
-    shader.use()
+    let lampShader = new Shader(gl, lampVsSource, lampFsSource)
 
     let vertices = [
-        -0.5, -0.5, -0.5,  0.0, 0.0,
-         0.5, -0.5, -0.5,  1.0, 0.0,
-         0.5,  0.5, -0.5,  1.0, 1.0,
-         0.5,  0.5, -0.5,  1.0, 1.0,
-        -0.5,  0.5, -0.5,  0.0, 1.0,
-        -0.5, -0.5, -0.5,  0.0, 0.0,
+    // positions       // normals        // texture coords
+    -0.5, -0.5, -0.5,  0.0,  0.0, -1.0,  0.0, 0.0,
+     0.5, -0.5, -0.5,  0.0,  0.0, -1.0,  1.0, 0.0,
+     0.5,  0.5, -0.5,  0.0,  0.0, -1.0,  1.0, 1.0,
+     0.5,  0.5, -0.5,  0.0,  0.0, -1.0,  1.0, 1.0,
+    -0.5,  0.5, -0.5,  0.0,  0.0, -1.0,  0.0, 1.0,
+    -0.5, -0.5, -0.5,  0.0,  0.0, -1.0,  0.0, 0.0,
 
-        -0.5, -0.5,  0.5,  0.0, 0.0,
-         0.5, -0.5,  0.5,  1.0, 0.0,
-         0.5,  0.5,  0.5,  1.0, 1.0,
-         0.5,  0.5,  0.5,  1.0, 1.0,
-        -0.5,  0.5,  0.5,  0.0, 1.0,
-        -0.5, -0.5,  0.5,  0.0, 0.0,
+    -0.5, -0.5,  0.5,  0.0,  0.0,  1.0,  0.0, 0.0,
+     0.5, -0.5,  0.5,  0.0,  0.0,  1.0,  1.0, 0.0,
+     0.5,  0.5,  0.5,  0.0,  0.0,  1.0,  1.0, 1.0,
+     0.5,  0.5,  0.5,  0.0,  0.0,  1.0,  1.0, 1.0,
+    -0.5,  0.5,  0.5,  0.0,  0.0,  1.0,  0.0, 1.0,
+    -0.5, -0.5,  0.5,  0.0,  0.0,  1.0,  0.0, 0.0,
 
-        -0.5,  0.5,  0.5,  1.0, 0.0,
-        -0.5,  0.5, -0.5,  1.0, 1.0,
-        -0.5, -0.5, -0.5,  0.0, 1.0,
-        -0.5, -0.5, -0.5,  0.0, 1.0,
-        -0.5, -0.5,  0.5,  0.0, 0.0,
-        -0.5,  0.5,  0.5,  1.0, 0.0,
+    -0.5,  0.5,  0.5, -1.0,  0.0,  0.0,  1.0, 0.0,
+    -0.5,  0.5, -0.5, -1.0,  0.0,  0.0,  1.0, 1.0,
+    -0.5, -0.5, -0.5, -1.0,  0.0,  0.0,  0.0, 1.0,
+    -0.5, -0.5, -0.5, -1.0,  0.0,  0.0,  0.0, 1.0,
+    -0.5, -0.5,  0.5, -1.0,  0.0,  0.0,  0.0, 0.0,
+    -0.5,  0.5,  0.5, -1.0,  0.0,  0.0,  1.0, 0.0,
 
-         0.5,  0.5,  0.5,  1.0, 0.0,
-         0.5,  0.5, -0.5,  1.0, 1.0,
-         0.5, -0.5, -0.5,  0.0, 1.0,
-         0.5, -0.5, -0.5,  0.0, 1.0,
-         0.5, -0.5,  0.5,  0.0, 0.0,
-         0.5,  0.5,  0.5,  1.0, 0.0,
+     0.5,  0.5,  0.5,  1.0,  0.0,  0.0,  1.0, 0.0,
+     0.5,  0.5, -0.5,  1.0,  0.0,  0.0,  1.0, 1.0,
+     0.5, -0.5, -0.5,  1.0,  0.0,  0.0,  0.0, 1.0,
+     0.5, -0.5, -0.5,  1.0,  0.0,  0.0,  0.0, 1.0,
+     0.5, -0.5,  0.5,  1.0,  0.0,  0.0,  0.0, 0.0,
+     0.5,  0.5,  0.5,  1.0,  0.0,  0.0,  1.0, 0.0,
 
-        -0.5, -0.5, -0.5,  0.0, 1.0,
-         0.5, -0.5, -0.5,  1.0, 1.0,
-         0.5, -0.5,  0.5,  1.0, 0.0,
-         0.5, -0.5,  0.5,  1.0, 0.0,
-        -0.5, -0.5,  0.5,  0.0, 0.0,
-        -0.5, -0.5, -0.5,  0.0, 1.0,
+    -0.5, -0.5, -0.5,  0.0, -1.0,  0.0,  0.0, 1.0,
+     0.5, -0.5, -0.5,  0.0, -1.0,  0.0,  1.0, 1.0,
+     0.5, -0.5,  0.5,  0.0, -1.0,  0.0,  1.0, 0.0,
+     0.5, -0.5,  0.5,  0.0, -1.0,  0.0,  1.0, 0.0,
+    -0.5, -0.5,  0.5,  0.0, -1.0,  0.0,  0.0, 0.0,
+    -0.5, -0.5, -0.5,  0.0, -1.0,  0.0,  0.0, 1.0,
 
-        -0.5,  0.5, -0.5,  0.0, 1.0,
-         0.5,  0.5, -0.5,  1.0, 1.0,
-         0.5,  0.5,  0.5,  1.0, 0.0,
-         0.5,  0.5,  0.5,  1.0, 0.0,
-        -0.5,  0.5,  0.5,  0.0, 0.0,
-        -0.5,  0.5, -0.5,  0.0, 1.0
+    -0.5,  0.5, -0.5,  0.0,  1.0,  0.0,  0.0, 1.0,
+     0.5,  0.5, -0.5,  0.0,  1.0,  0.0,  1.0, 1.0,
+     0.5,  0.5,  0.5,  0.0,  1.0,  0.0,  1.0, 0.0,
+     0.5,  0.5,  0.5,  0.0,  1.0,  0.0,  1.0, 0.0,
+    -0.5,  0.5,  0.5,  0.0,  1.0,  0.0,  0.0, 0.0,
+    -0.5,  0.5, -0.5,  0.0,  1.0,  0.0,  0.0, 1.0
     ]
+
     let cubePositions = [
         [ 0.0,  0.0,  0.0],
         [ 2.0,  5.0, -15.0],
@@ -137,52 +144,70 @@ async function init(){
         [ 1.5,  0.2, -1.5],
         [-1.3,  1.0, -1.5]
     ]
+
+
     let VBO = gl.createBuffer()
     gl.bindBuffer(gl.ARRAY_BUFFER, VBO)
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW)
 
     let aVertexPosition = gl.getAttribLocation(shader.Program, 'aPos')
-    gl.vertexAttribPointer(aVertexPosition, 3, gl.FLOAT, true, 20, 0)
+    gl.vertexAttribPointer(aVertexPosition, 3, gl.FLOAT, true, 32, 0)
     gl.enableVertexAttribArray(aVertexPosition)
 
+    let aNormal = gl.getAttribLocation(shader.Program, 'aNormal')
+    gl.vertexAttribPointer(aNormal, 3, gl.FLOAT, true, 32, 12)
+    gl.enableVertexAttribArray(aNormal)
+
     let aTexCoord = gl.getAttribLocation(shader.Program, 'aTexCoord')
-    gl.vertexAttribPointer(aTexCoord, 2, gl.FLOAT, true, 20, 12)
+    gl.vertexAttribPointer(aTexCoord, 2, gl.FLOAT, true, 32, 24)
     gl.enableVertexAttribArray(aTexCoord)
 
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true)
 
-    let wallImage = await loadImage(wall)
-    let texture1 = gl.createTexture()
+    let BoxDiffuse = await loadImage(box)
+    let diffuse = gl.createTexture()
     gl.activeTexture(gl.TEXTURE0)
-    gl.bindTexture(gl.TEXTURE_2D, texture1)
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, wallImage)
-    gl.generateMipmap(gl.TEXTURE_2D)
-
-    let AvatarImage = await loadImage(Avatar)
-    let texture2 = gl.createTexture()
-    gl.activeTexture(gl.TEXTURE1)
-    gl.bindTexture(gl.TEXTURE_2D, texture2)
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, AvatarImage)
+    gl.bindTexture(gl.TEXTURE_2D, diffuse)
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, BoxDiffuse)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
 
-    shader.setInt('texture1', 0)
-    shader.setInt('texture2', 1)
+    let boxSpecular = await loadImage(box_specular)
+    let specular = gl.createTexture()
+    gl.bindTexture(gl.TEXTURE_2D, specular)
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, boxSpecular)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+
+    shader.use()
+    shader.setInt('material.diffuse', 0)
+    shader.setInt('material.specular', 1)
 
     animate()
 
-    function drawScene() {
-        gl.clearColor(0.0, 0.5, 1.0, 1.0)
+    function drawScene(timeStamp) {
+        gl.clearColor(0.1, 0.1, 0.1, 1.0)
         gl.clear(gl.COLOR_BUFFER_BIT)
 
-        gl.activeTexture(gl.TEXTURE0)
-        gl.bindTexture(gl.TEXTURE_2D, texture1)
-        gl.activeTexture(gl.TEXTURE1)
-        gl.bindTexture(gl.TEXTURE_2D, texture2)
-
         shader.use()
+
+        shader.setVec3("light.direction", glm.vec3.fromValues(-0.2, -1.0, -0.3))
+        shader.setVec3('viewPos', camera.position)
+
+        // light properties
+        shader.setVec3('light.ambient', glm.vec3.fromValues(0.2, 0.2, 0.2))
+        shader.setVec3('light.diffuse', glm.vec3.fromValues(0.5, 0.5, 0.5))
+        shader.setVec3('light.specular', glm.vec3.fromValues(1.0, 1.0, 1.0))
+
+        // material properties
+
+        gl.activeTexture(gl.TEXTURE0)
+        gl.bindTexture(gl.TEXTURE_2D, diffuse)
+        gl.activeTexture(gl.TEXTURE1)
+        gl.bindTexture(gl.TEXTURE_2D, specular)
+        shader.setFloat('material.shininess', 64.0)
 
         let view = camera.getViewMatrix()
         shader.setMat4('view', view)
@@ -195,10 +220,27 @@ async function init(){
             let model = glm.mat4.create()
             glm.mat4.translate(model, model, glm.vec3.fromValues(...element))
             let angle = 20.0 * index
-            glm.mat4.rotate(model, model, glm.glMatrix.toRadian(angle+Date.now()*0.03), glm.vec3.fromValues(0.1, 0.3, 0.5))
+            glm.mat4.rotate(model, model, glm.glMatrix.toRadian(angle), glm.vec3.fromValues(0.1, 0.3, 0.5))
             shader.setMat4('model', model)
+
+            let normalMatrix = glm.mat3.create()
+            glm.mat3.fromMat4(normalMatrix, model)
+            glm.mat3.invert(normalMatrix, normalMatrix)
+            glm.mat3.transpose(normalMatrix, normalMatrix)
+            shader.setMat3('normalMatrix', normalMatrix)
+
             gl.drawArrays(gl.TRIANGLES, 0, 36)
         })
+
+        // a lamp object is weird when we only have a directional light, don't render the light object
+        // lampShader.use()
+        // lampShader.setMat4('projection', projection)
+        // lampShader.setMat4('view', view)
+        // model = glm.mat4.create()
+        // glm.mat4.translate(model, model, lightPos)
+        // glm.mat4.scale(model, model, glm.vec3.fromValues(0.2, 0.2, 0.2))
+        // lampShader.setMat4('model', model)
+        // gl.drawArrays(gl.TRIANGLES, 0, 36)
     }
 
     function animate(timeStamp) {
@@ -208,7 +250,7 @@ async function init(){
 
         processInput()
 
-        drawScene()
+        drawScene(timeStamp)
         requestAnimationFrame(animate)
     }
 
@@ -242,7 +284,6 @@ async function init(){
     }
 
     function wheel_callback(e) {
-        //console.log(e.wheelDeltaY)
         camera.processMouseScroll(e.wheelDeltaY)
     }
 
@@ -256,6 +297,5 @@ function loadImage(src){
       img.src = src
     })
 }
-
 
 init()

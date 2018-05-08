@@ -1,4 +1,4 @@
-import * as glm from 'gl-matrix';
+import * as glm from 'gl-matrix'
 
 import Shader from './shader'
 import vsSource from '../05 Coordinate Systems/coordinate_systems.vs'
@@ -16,7 +16,7 @@ async function init(){
     window.onresize = function(){
         canvas.width = window.innerWidth
         canvas.height = window.innerHeight
-        gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+        gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
         drawScene()
     }
     document.body.appendChild(canvas)

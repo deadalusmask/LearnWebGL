@@ -1,4 +1,4 @@
-import * as glm from 'gl-matrix';
+import * as glm from 'gl-matrix'
 
 import Camera from './../../camera'
 import Shader from './../../shader'
@@ -49,8 +49,8 @@ async function init(){
         canvas.requestPointerLock()
     }
 
-    document.addEventListener('pointerlockchange', handleLockChange, false);
-    document.addEventListener('mozpointerlockchange', handleLockChange, false);
+    document.addEventListener('pointerlockchange', handleLockChange, false)
+    document.addEventListener('mozpointerlockchange', handleLockChange, false)
 
     function handleLockChange() {
         if (document.pointerLockElement === canvas ||

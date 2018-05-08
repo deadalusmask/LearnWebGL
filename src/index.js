@@ -1,9 +1,9 @@
-import * as glm from 'gl-matrix';
+import * as glm from 'gl-matrix'
 
 import Camera from './camera'
 import Shader from './shader'
 import vsSource from './02 Lighting/04 Lighting maps/lighting_maps.vs'
-import fsSource from './02 Lighting/04 Lighting maps/lighting_maps2.fs'
+import fsSource from './02 Lighting/05 Light casters/light_casters_point.fs'
 import lampVsSource from './02 Lighting/01 Colors/lamp.vs'
 import lampFsSource from './02 Lighting/01 Colors/lamp.fs'
 
@@ -132,6 +132,20 @@ async function init(){
     -0.5,  0.5, -0.5,  0.0,  1.0,  0.0,  0.0, 1.0
     ]
 
+    let cubePositions = [
+        [ 0.0,  0.0,  0.0],
+        [ 2.0,  5.0, -15.0],
+        [-1.5, -2.2, -2.5],
+        [-3.8, -2.0, -12.3],
+        [ 2.4, -0.4, -3.5],
+        [-1.7,  3.0, -7.5],
+        [ 1.3, -2.0, -2.5],
+        [ 1.5,  2.0, -2.5],
+        [ 1.5,  0.2, -1.5],
+        [-1.3,  1.0, -1.5]
+    ]
+
+
     let VBO = gl.createBuffer()
     gl.bindBuffer(gl.ARRAY_BUFFER, VBO)
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW)
@@ -179,16 +193,18 @@ async function init(){
 
         shader.use()
 
-        shader.setVec3('light.position', lightPos)
+        shader.setVec3("light.position", lightPos)
         shader.setVec3('viewPos', camera.position)
 
         // light properties
         shader.setVec3('light.ambient', glm.vec3.fromValues(0.2, 0.2, 0.2))
         shader.setVec3('light.diffuse', glm.vec3.fromValues(0.5, 0.5, 0.5))
         shader.setVec3('light.specular', glm.vec3.fromValues(1.0, 1.0, 1.0))
+        shader.setFloat("light.constant", 1.0)
+        shader.setFloat("light.linear", 0.09)
+        shader.setFloat("light.quadratic", 0.032)
 
         // material properties
-
         gl.activeTexture(gl.TEXTURE0)
         gl.bindTexture(gl.TEXTURE_2D, diffuse)
         gl.activeTexture(gl.TEXTURE1)
@@ -202,22 +218,27 @@ async function init(){
         glm.mat4.perspective(projection, glm.glMatrix.toRadian(camera.zoom), gl.canvas.clientWidth/gl.canvas.clientHeight, 0.1, 100)
         shader.setMat4('projection', projection)
 
-        let model = glm.mat4.create()
-        //glm.mat4.rotate(model, model, glm.glMatrix.toRadian(Date.now()*0.03), glm.vec3.fromValues(0.1, 0.3, 0.5))
-        shader.setMat4('model', model)
+        cubePositions.forEach((element, index)=>{
+            let model = glm.mat4.create()
+            glm.mat4.translate(model, model, glm.vec3.fromValues(...element))
+            let angle = 20.0 * index
+            glm.mat4.rotate(model, model, glm.glMatrix.toRadian(angle), glm.vec3.fromValues(0.1, 0.3, 0.5))
+            shader.setMat4('model', model)
 
-        let normalMatrix = glm.mat3.create()
-        glm.mat3.fromMat4(normalMatrix, model)
-        glm.mat3.invert(normalMatrix, normalMatrix)
-        glm.mat3.transpose(normalMatrix, normalMatrix)
-        shader.setMat3('normalMatrix', normalMatrix)
+            let normalMatrix = glm.mat3.create()
+            glm.mat3.fromMat4(normalMatrix, model)
+            glm.mat3.invert(normalMatrix, normalMatrix)
+            glm.mat3.transpose(normalMatrix, normalMatrix)
+            shader.setMat3('normalMatrix', normalMatrix)
 
-        gl.drawArrays(gl.TRIANGLES, 0, 36)
+            gl.drawArrays(gl.TRIANGLES, 0, 36)
+        })
+
 
         lampShader.use()
         lampShader.setMat4('projection', projection)
         lampShader.setMat4('view', view)
-        model = glm.mat4.create()
+        let model = glm.mat4.create()
         glm.mat4.translate(model, model, lightPos)
         glm.mat4.scale(model, model, glm.vec3.fromValues(0.2, 0.2, 0.2))
         lampShader.setMat4('model', model)
@@ -265,7 +286,6 @@ async function init(){
     }
 
     function wheel_callback(e) {
-        //console.log(e.wheelDeltaY)
         camera.processMouseScroll(e.wheelDeltaY)
     }
 
