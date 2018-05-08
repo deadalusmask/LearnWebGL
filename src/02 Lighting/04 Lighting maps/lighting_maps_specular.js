@@ -1,14 +1,14 @@
 import * as glm from 'gl-matrix';
 
-import Camera from './camera'
-import Shader from './shader'
-import vsSource from './02 Lighting/04 Lighting maps/lighting_maps.vs'
-import fsSource from './02 Lighting/04 Lighting maps/lighting_maps2.fs'
-import lampVsSource from './02 Lighting/01 Colors/lamp.vs'
-import lampFsSource from './02 Lighting/01 Colors/lamp.fs'
+import Camera from './../../camera'
+import Shader from './../../shader'
+import vsSource from './lighting_maps.vs'
+import fsSource from './lighting_maps2.fs'
+import lampVsSource from './../01 Colors/lamp.vs'
+import lampFsSource from './../01 Colors/lamp.fs'
 
-import box from './assets/box.png'
-import box_specular from './assets/box_specular.png'
+import box from './../../assets/box.png'
+import box_specular from './../../assets/box_specular.png'
 
 async function init(){
     document.body.style.margin = 0

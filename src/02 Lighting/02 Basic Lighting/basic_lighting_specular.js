@@ -152,7 +152,7 @@ async function init(){
         shader.setVec3('objectColor', glm.vec3.fromValues(1.0, 0.5, 0.3))
         shader.setVec3('lightColor', glm.vec3.fromValues(1.0, 1.0, 1.0))
         shader.setVec3('lightPos', lightPos)
-        shader.setVec3("viewPos", camera.position)
+        shader.setVec3('viewPos', camera.position)
 
         let view = camera.getViewMatrix()
         shader.setMat4('view', view)

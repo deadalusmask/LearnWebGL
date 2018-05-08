@@ -1,14 +1,12 @@
 import * as glm from 'gl-matrix';
 
-import Camera from './camera'
-import Shader from './shader'
-import vsSource from './02 Lighting/04 Lighting maps/lighting_maps.vs'
-import fsSource from './02 Lighting/04 Lighting maps/lighting_maps2.fs'
-import lampVsSource from './02 Lighting/01 Colors/lamp.vs'
-import lampFsSource from './02 Lighting/01 Colors/lamp.fs'
+import Camera from './../../camera'
+import Shader from './../../shader'
+import vsSource from './../02 Basic Lighting/basic_lighting.vs'
+import fsSource from './materials.fs'
+import lampVsSource from './../01 Colors/lamp.vs'
+import lampFsSource from './../01 Colors/lamp.fs'
 
-import box from './assets/box.png'
-import box_specular from './assets/box_specular.png'
 
 async function init(){
     document.body.style.margin = 0
@@ -88,48 +86,47 @@ async function init(){
     let lampShader = new Shader(gl, lampVsSource, lampFsSource)
 
     let vertices = [
-    // positions       // normals        // texture coords
-    -0.5, -0.5, -0.5,  0.0,  0.0, -1.0,  0.0, 0.0,
-     0.5, -0.5, -0.5,  0.0,  0.0, -1.0,  1.0, 0.0,
-     0.5,  0.5, -0.5,  0.0,  0.0, -1.0,  1.0, 1.0,
-     0.5,  0.5, -0.5,  0.0,  0.0, -1.0,  1.0, 1.0,
-    -0.5,  0.5, -0.5,  0.0,  0.0, -1.0,  0.0, 1.0,
-    -0.5, -0.5, -0.5,  0.0,  0.0, -1.0,  0.0, 0.0,
+        -0.5, -0.5, -0.5,  0.0,  0.0, -1.0,
+         0.5, -0.5, -0.5,  0.0,  0.0, -1.0,
+         0.5,  0.5, -0.5,  0.0,  0.0, -1.0,
+         0.5,  0.5, -0.5,  0.0,  0.0, -1.0,
+        -0.5,  0.5, -0.5,  0.0,  0.0, -1.0,
+        -0.5, -0.5, -0.5,  0.0,  0.0, -1.0,
 
-    -0.5, -0.5,  0.5,  0.0,  0.0,  1.0,  0.0, 0.0,
-     0.5, -0.5,  0.5,  0.0,  0.0,  1.0,  1.0, 0.0,
-     0.5,  0.5,  0.5,  0.0,  0.0,  1.0,  1.0, 1.0,
-     0.5,  0.5,  0.5,  0.0,  0.0,  1.0,  1.0, 1.0,
-    -0.5,  0.5,  0.5,  0.0,  0.0,  1.0,  0.0, 1.0,
-    -0.5, -0.5,  0.5,  0.0,  0.0,  1.0,  0.0, 0.0,
+        -0.5, -0.5,  0.5,  0.0,  0.0,  1.0,
+         0.5, -0.5,  0.5,  0.0,  0.0,  1.0,
+         0.5,  0.5,  0.5,  0.0,  0.0,  1.0,
+         0.5,  0.5,  0.5,  0.0,  0.0,  1.0,
+        -0.5,  0.5,  0.5,  0.0,  0.0,  1.0,
+        -0.5, -0.5,  0.5,  0.0,  0.0,  1.0,
 
-    -0.5,  0.5,  0.5, -1.0,  0.0,  0.0,  1.0, 0.0,
-    -0.5,  0.5, -0.5, -1.0,  0.0,  0.0,  1.0, 1.0,
-    -0.5, -0.5, -0.5, -1.0,  0.0,  0.0,  0.0, 1.0,
-    -0.5, -0.5, -0.5, -1.0,  0.0,  0.0,  0.0, 1.0,
-    -0.5, -0.5,  0.5, -1.0,  0.0,  0.0,  0.0, 0.0,
-    -0.5,  0.5,  0.5, -1.0,  0.0,  0.0,  1.0, 0.0,
+        -0.5,  0.5,  0.5, -1.0,  0.0,  0.0,
+        -0.5,  0.5, -0.5, -1.0,  0.0,  0.0,
+        -0.5, -0.5, -0.5, -1.0,  0.0,  0.0,
+        -0.5, -0.5, -0.5, -1.0,  0.0,  0.0,
+        -0.5, -0.5,  0.5, -1.0,  0.0,  0.0,
+        -0.5,  0.5,  0.5, -1.0,  0.0,  0.0,
 
-     0.5,  0.5,  0.5,  1.0,  0.0,  0.0,  1.0, 0.0,
-     0.5,  0.5, -0.5,  1.0,  0.0,  0.0,  1.0, 1.0,
-     0.5, -0.5, -0.5,  1.0,  0.0,  0.0,  0.0, 1.0,
-     0.5, -0.5, -0.5,  1.0,  0.0,  0.0,  0.0, 1.0,
-     0.5, -0.5,  0.5,  1.0,  0.0,  0.0,  0.0, 0.0,
-     0.5,  0.5,  0.5,  1.0,  0.0,  0.0,  1.0, 0.0,
+         0.5,  0.5,  0.5,  1.0,  0.0,  0.0,
+         0.5,  0.5, -0.5,  1.0,  0.0,  0.0,
+         0.5, -0.5, -0.5,  1.0,  0.0,  0.0,
+         0.5, -0.5, -0.5,  1.0,  0.0,  0.0,
+         0.5, -0.5,  0.5,  1.0,  0.0,  0.0,
+         0.5,  0.5,  0.5,  1.0,  0.0,  0.0,
 
-    -0.5, -0.5, -0.5,  0.0, -1.0,  0.0,  0.0, 1.0,
-     0.5, -0.5, -0.5,  0.0, -1.0,  0.0,  1.0, 1.0,
-     0.5, -0.5,  0.5,  0.0, -1.0,  0.0,  1.0, 0.0,
-     0.5, -0.5,  0.5,  0.0, -1.0,  0.0,  1.0, 0.0,
-    -0.5, -0.5,  0.5,  0.0, -1.0,  0.0,  0.0, 0.0,
-    -0.5, -0.5, -0.5,  0.0, -1.0,  0.0,  0.0, 1.0,
+        -0.5, -0.5, -0.5,  0.0, -1.0,  0.0,
+         0.5, -0.5, -0.5,  0.0, -1.0,  0.0,
+         0.5, -0.5,  0.5,  0.0, -1.0,  0.0,
+         0.5, -0.5,  0.5,  0.0, -1.0,  0.0,
+        -0.5, -0.5,  0.5,  0.0, -1.0,  0.0,
+        -0.5, -0.5, -0.5,  0.0, -1.0,  0.0,
 
-    -0.5,  0.5, -0.5,  0.0,  1.0,  0.0,  0.0, 1.0,
-     0.5,  0.5, -0.5,  0.0,  1.0,  0.0,  1.0, 1.0,
-     0.5,  0.5,  0.5,  0.0,  1.0,  0.0,  1.0, 0.0,
-     0.5,  0.5,  0.5,  0.0,  1.0,  0.0,  1.0, 0.0,
-    -0.5,  0.5,  0.5,  0.0,  1.0,  0.0,  0.0, 0.0,
-    -0.5,  0.5, -0.5,  0.0,  1.0,  0.0,  0.0, 1.0
+        -0.5,  0.5, -0.5,  0.0,  1.0,  0.0,
+         0.5,  0.5, -0.5,  0.0,  1.0,  0.0,
+         0.5,  0.5,  0.5,  0.0,  1.0,  0.0,
+         0.5,  0.5,  0.5,  0.0,  1.0,  0.0,
+        -0.5,  0.5,  0.5,  0.0,  1.0,  0.0,
+        -0.5,  0.5, -0.5,  0.0,  1.0,  0.0
     ]
 
     let VBO = gl.createBuffer()
@@ -137,39 +134,12 @@ async function init(){
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW)
 
     let aVertexPosition = gl.getAttribLocation(shader.Program, 'aPos')
-    gl.vertexAttribPointer(aVertexPosition, 3, gl.FLOAT, true, 32, 0)
+    gl.vertexAttribPointer(aVertexPosition, 3, gl.FLOAT, true, 24, 0)
     gl.enableVertexAttribArray(aVertexPosition)
 
     let aNormal = gl.getAttribLocation(shader.Program, 'aNormal')
-    gl.vertexAttribPointer(aNormal, 3, gl.FLOAT, true, 32, 12)
+    gl.vertexAttribPointer(aNormal, 3, gl.FLOAT, true, 24, 12)
     gl.enableVertexAttribArray(aNormal)
-
-    let aTexCoord = gl.getAttribLocation(shader.Program, 'aTexCoord')
-    gl.vertexAttribPointer(aTexCoord, 2, gl.FLOAT, true, 32, 24)
-    gl.enableVertexAttribArray(aTexCoord)
-
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true)
-
-    let BoxDiffuse = await loadImage(box)
-    let diffuse = gl.createTexture()
-    gl.activeTexture(gl.TEXTURE0)
-    gl.bindTexture(gl.TEXTURE_2D, diffuse)
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, BoxDiffuse)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-
-    let boxSpecular = await loadImage(box_specular)
-    let specular = gl.createTexture()
-    gl.bindTexture(gl.TEXTURE_2D, specular)
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, boxSpecular)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-
-    shader.use()
-    shader.setInt('material.diffuse', 0)
-    shader.setInt('material.specular', 1)
 
     animate()
 
@@ -178,22 +148,28 @@ async function init(){
         gl.clear(gl.COLOR_BUFFER_BIT)
 
         shader.use()
-
         shader.setVec3('light.position', lightPos)
         shader.setVec3('viewPos', camera.position)
 
         // light properties
-        shader.setVec3('light.ambient', glm.vec3.fromValues(0.2, 0.2, 0.2))
-        shader.setVec3('light.diffuse', glm.vec3.fromValues(0.5, 0.5, 0.5))
+        let lightColor = glm.vec3.create()
+
+        lightColor[0] = Math.sin(timeStamp * 0.001)
+        lightColor[1] = Math.sin(timeStamp * 0.0003)
+        lightColor[2] = Math.sin(timeStamp * 0.0006)
+        let diffuseColor = glm.vec3.create()
+        glm.vec3.mul(diffuseColor, lightColor, glm.vec3.fromValues(0.5, 0.5, 0.5))
+        let ambientColor = glm.vec3.create()
+        glm.vec3.mul(ambientColor, lightColor, glm.vec3.fromValues(0.2, 0.2, 0.2))
+        shader.setVec3('light.ambient', ambientColor)
+        shader.setVec3('light.diffuse', diffuseColor)
         shader.setVec3('light.specular', glm.vec3.fromValues(1.0, 1.0, 1.0))
 
         // material properties
-
-        gl.activeTexture(gl.TEXTURE0)
-        gl.bindTexture(gl.TEXTURE_2D, diffuse)
-        gl.activeTexture(gl.TEXTURE1)
-        gl.bindTexture(gl.TEXTURE_2D, specular)
-        shader.setFloat('material.shininess', 64.0)
+        shader.setVec3('material.ambient', glm.vec3.fromValues(1.0, 0.5, 0.3))
+        shader.setVec3('material.diffuse', glm.vec3.fromValues(1.0, 0.5, 0.3))
+        shader.setVec3('material.specular', glm.vec3.fromValues(0.5, 0.5, 0.5))
+        shader.setFloat('material.shininess', 32.0)
 
         let view = camera.getViewMatrix()
         shader.setMat4('view', view)
@@ -271,13 +247,5 @@ async function init(){
 
 }
 
-function loadImage(src){
-    return new Promise((resolve, reject) => {
-      let img = new Image()
-      img.onload = () => resolve(img)
-      img.onerror = reject
-      img.src = src
-    })
-}
 
 init()

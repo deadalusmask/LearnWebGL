@@ -1,14 +1,13 @@
 import * as glm from 'gl-matrix';
 
-import Camera from './camera'
-import Shader from './shader'
-import vsSource from './02 Lighting/04 Lighting maps/lighting_maps.vs'
-import fsSource from './02 Lighting/04 Lighting maps/lighting_maps2.fs'
-import lampVsSource from './02 Lighting/01 Colors/lamp.vs'
-import lampFsSource from './02 Lighting/01 Colors/lamp.fs'
+import Camera from './../../camera'
+import Shader from './../../shader'
+import vsSource from './lighting_maps.vs'
+import fsSource from './lighting_maps.fs'
+import lampVsSource from './../01 Colors/lamp.vs'
+import lampFsSource from './../01 Colors/lamp.fs'
 
-import box from './assets/box.png'
-import box_specular from './assets/box_specular.png'
+import box from './../../assets/box.png'
 
 async function init(){
     document.body.style.margin = 0
@@ -158,18 +157,10 @@ async function init(){
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-
-    let boxSpecular = await loadImage(box_specular)
-    let specular = gl.createTexture()
-    gl.bindTexture(gl.TEXTURE_2D, specular)
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, boxSpecular)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
 
     shader.use()
     shader.setInt('material.diffuse', 0)
-    shader.setInt('material.specular', 1)
 
     animate()
 
@@ -190,10 +181,10 @@ async function init(){
         // material properties
 
         gl.activeTexture(gl.TEXTURE0)
-        gl.bindTexture(gl.TEXTURE_2D, diffuse)
-        gl.activeTexture(gl.TEXTURE1)
-        gl.bindTexture(gl.TEXTURE_2D, specular)
-        shader.setFloat('material.shininess', 64.0)
+        gl.bindTexture(gl.TEXTURE_2D, texture1)
+
+        shader.setVec3('material.specular', glm.vec3.fromValues(0.5, 0.5, 0.5))
+        shader.setFloat('material.shininess', 32.0)
 
         let view = camera.getViewMatrix()
         shader.setMat4('view', view)

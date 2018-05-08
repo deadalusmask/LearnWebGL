@@ -12,7 +12,7 @@ const CameraMovement = Object.freeze({
 const YAW = -90.0
 const PITCH = 0.0
 const SPEED = 0.005
-const SENSITIVITY = 0.1
+const SENSITIVITY = 0.05
 const ZOOM = 45.0
 
 class Camera {
