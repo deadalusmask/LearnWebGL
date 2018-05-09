@@ -16,7 +16,7 @@ module.exports = {
         ]
       },
       {
-        test: /\.(glsl|vs|fs|txt)$/,
+        test: /\.(glsl|vs|fs|obj|txt)$/,
         use: 'raw-loader'
       }
     ]
