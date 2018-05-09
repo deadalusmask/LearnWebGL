@@ -3,9 +3,9 @@ import * as glm from 'gl-matrix'
 import Camera from './../../camera'
 import Shader from './../../shader'
 import vsSource from './../04 Lighting maps/lighting_maps.vs'
-import fsSource from './light_casters_point.fs'
-import lampVsSource from './../01 Colors/lamp.vs'
-import lampFsSource from './../01 Colors/lamp.fs'
+import fsSource from './multiple_lights.fs'
+import lampVsSource from './02 Lighting/01 Colors/lamp.vs'
+import lampFsSource from './02 Lighting/01 Colors/lamp.fs'
 
 import box from './../../assets/box.png'
 import box_specular from './../../assets/box_specular.png'
@@ -24,9 +24,6 @@ async function init(){
     // timting
     let deltaTime = 0
     let lastFrame = 0
-
-    // lighting
-    let lightPos = glm.vec3.fromValues(1.2, 1.0, 2.0)
 
     // resize window
     window.onresize = function(){
@@ -145,6 +142,12 @@ async function init(){
         [-1.3,  1.0, -1.5]
     ]
 
+    let pointLightPositions = [
+        [0.7,  0.2,  2.0],
+        [2.3, -3.3, -4.0],
+        [4.0,  2.0, -12.0],
+        [0.0,  0.0, -3.0]
+    ]
 
     let VBO = gl.createBuffer()
     gl.bindBuffer(gl.ARRAY_BUFFER, VBO)
@@ -193,16 +196,56 @@ async function init(){
 
         shader.use()
 
-        shader.setVec3('light.position', lightPos)
         shader.setVec3('viewPos', camera.position)
 
         // light properties
-        shader.setVec3('light.ambient', glm.vec3.fromValues(0.2, 0.2, 0.2))
-        shader.setVec3('light.diffuse', glm.vec3.fromValues(0.5, 0.5, 0.5))
-        shader.setVec3('light.specular', glm.vec3.fromValues(1.0, 1.0, 1.0))
-        shader.setFloat('light.constant', 1.0)
-        shader.setFloat('light.linear', 0.09)
-        shader.setFloat('light.quadratic', 0.032)
+        shader.setVec3('dirLight.direction', glm.vec3.fromValues(-0.2, -1.0, -0.3))
+        shader.setVec3('dirLight.ambient', glm.vec3.fromValues(0.05, 0.05, 0.05))
+        shader.setVec3('dirLight.diffuse', glm.vec3.fromValues(0.4, 0.4, 0.4))
+        shader.setVec3('dirLight.specular', glm.vec3.fromValues(0.5, 0.5, 0.5))
+        // point light 1
+        shader.setVec3('pointLights[0].position', pointLightPositions[0])
+        shader.setVec3('pointLights[0].ambient', glm.vec3.fromValues(0.05, 0.05, 0.05))
+        shader.setVec3('pointLights[0].diffuse', glm.vec3.fromValues(0.8, 0.8, 0.8))
+        shader.setVec3('pointLights[0].specular', glm.vec3.fromValues(1.0, 1.0, 1.0))
+        shader.setFloat('pointLights[0].constant', 1.0)
+        shader.setFloat('pointLights[0].linear', 0.09)
+        shader.setFloat('pointLights[0].quadratic', 0.032)
+        // point light 2
+        shader.setVec3('pointLights[1].position', pointLightPositions[1])
+        shader.setVec3('pointLights[1].ambient', glm.vec3.fromValues(0.05, 0.05, 0.05))
+        shader.setVec3('pointLights[1].diffuse', glm.vec3.fromValues(0.8, 0.8, 0.8))
+        shader.setVec3('pointLights[1].specular', glm.vec3.fromValues(1.0, 1.0, 1.0))
+        shader.setFloat('pointLights[1].constant', 1.0)
+        shader.setFloat('pointLights[1].linear', 0.09)
+        shader.setFloat('pointLights[1].quadratic', 0.032)
+        // point light 3
+        shader.setVec3('pointLights[2].position', pointLightPositions[2])
+        shader.setVec3('pointLights[2].ambient', glm.vec3.fromValues(0.05, 0.05, 0.05))
+        shader.setVec3('pointLights[2].diffuse', glm.vec3.fromValues(0.8, 0.8, 0.8))
+        shader.setVec3('pointLights[2].specular', glm.vec3.fromValues(1.0, 1.0, 1.0))
+        shader.setFloat('pointLights[2].constant', 1.0)
+        shader.setFloat('pointLights[2].linear', 0.09)
+        shader.setFloat('pointLights[2].quadratic', 0.032)
+        // point light 4
+        shader.setVec3('pointLights[3].position', pointLightPositions[3])
+        shader.setVec3('pointLights[3].ambient', glm.vec3.fromValues(0.05, 0.05, 0.05))
+        shader.setVec3('pointLights[3].diffuse', glm.vec3.fromValues(0.8, 0.8, 0.8))
+        shader.setVec3('pointLights[3].specular', glm.vec3.fromValues(1.0, 1.0, 1.0))
+        shader.setFloat('pointLights[3].constant', 1.0)
+        shader.setFloat('pointLights[3].linear', 0.09)
+        shader.setFloat('pointLights[3].quadratic', 0.032)
+        // spotLight
+        shader.setVec3('spotLight.position', camera.position)
+        shader.setVec3('spotLight.direction', camera.front)
+        shader.setVec3('spotLight.ambient', glm.vec3.fromValues(0.0, 0.0, 0.0))
+        shader.setVec3('spotLight.diffuse', glm.vec3.fromValues(1.0, 1.0, 1.0))
+        shader.setVec3('spotLight.specular', glm.vec3.fromValues(1.0, 1.0, 1.0))
+        shader.setFloat('spotLight.constant', 1.0)
+        shader.setFloat('spotLight.linear', 0.09)
+        shader.setFloat('spotLight.quadratic', 0.032)
+        shader.setFloat('spotLight.cutOff', Math.cos(glm.glMatrix.toRadian(12.5)))
+        shader.setFloat('spotLight.outerCutOff', Math.cos(glm.glMatrix.toRadian(15.0)))
 
         // material properties
         gl.activeTexture(gl.TEXTURE0)
@@ -238,11 +281,14 @@ async function init(){
         lampShader.use()
         lampShader.setMat4('projection', projection)
         lampShader.setMat4('view', view)
-        let model = glm.mat4.create()
-        glm.mat4.translate(model, model, lightPos)
-        glm.mat4.scale(model, model, glm.vec3.fromValues(0.2, 0.2, 0.2))
-        lampShader.setMat4('model', model)
-        gl.drawArrays(gl.TRIANGLES, 0, 36)
+        pointLightPositions.forEach((element, index)=>{
+            let model = glm.mat4.create()
+            glm.mat4.translate(model, model, glm.vec3.fromValues(...element))
+            glm.mat4.scale(model, model, glm.vec3.fromValues(0.2, 0.2, 0.2))
+            lampShader.setMat4('model', model);
+            gl.drawArrays(gl.TRIANGLES, 0, 36);
+        })
+
     }
 
     function animate(timeStamp) {

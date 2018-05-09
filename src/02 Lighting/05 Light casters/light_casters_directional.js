@@ -193,7 +193,7 @@ async function init(){
 
         shader.use()
 
-        shader.setVec3("light.direction", glm.vec3.fromValues(-0.2, -1.0, -0.3))
+        shader.setVec3('light.direction', glm.vec3.fromValues(-0.2, -1.0, -0.3))
         shader.setVec3('viewPos', camera.position)
 
         // light properties

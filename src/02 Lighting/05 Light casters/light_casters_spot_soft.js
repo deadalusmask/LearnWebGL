@@ -3,12 +3,13 @@ import * as glm from 'gl-matrix'
 import Camera from './../../camera'
 import Shader from './../../shader'
 import vsSource from './../04 Lighting maps/lighting_maps.vs'
-import fsSource from './light_casters_point.fs'
-import lampVsSource from './../01 Colors/lamp.vs'
-import lampFsSource from './../01 Colors/lamp.fs'
+import fsSource from './light_casters_spot_soft.fs'
+import lampVsSource from './02 Lighting/01 Colors/lamp.vs'
+import lampFsSource from './02 Lighting/01 Colors/lamp.fs'
 
 import box from './../../assets/box.png'
 import box_specular from './../../assets/box_specular.png'
+
 
 async function init(){
     document.body.style.margin = 0
@@ -26,7 +27,7 @@ async function init(){
     let lastFrame = 0
 
     // lighting
-    let lightPos = glm.vec3.fromValues(1.2, 1.0, 2.0)
+    // let lightPos = glm.vec3.fromValues(1.2, 1.0, 2.0)
 
     // resize window
     window.onresize = function(){
@@ -193,10 +194,14 @@ async function init(){
 
         shader.use()
 
-        shader.setVec3('light.position', lightPos)
         shader.setVec3('viewPos', camera.position)
 
         // light properties
+        shader.setVec3('light.position',  camera.position)
+        shader.setVec3('light.direction', camera.front)
+        shader.setFloat('light.cutOff', Math.cos(glm.glMatrix.toRadian(12.5)))
+        shader.setFloat('light.outerCutOff', Math.cos(glm.glMatrix.toRadian(17.5)))
+
         shader.setVec3('light.ambient', glm.vec3.fromValues(0.2, 0.2, 0.2))
         shader.setVec3('light.diffuse', glm.vec3.fromValues(0.5, 0.5, 0.5))
         shader.setVec3('light.specular', glm.vec3.fromValues(1.0, 1.0, 1.0))
@@ -235,14 +240,14 @@ async function init(){
         })
 
 
-        lampShader.use()
-        lampShader.setMat4('projection', projection)
-        lampShader.setMat4('view', view)
-        let model = glm.mat4.create()
-        glm.mat4.translate(model, model, lightPos)
-        glm.mat4.scale(model, model, glm.vec3.fromValues(0.2, 0.2, 0.2))
-        lampShader.setMat4('model', model)
-        gl.drawArrays(gl.TRIANGLES, 0, 36)
+        // lampShader.use()
+        // lampShader.setMat4('projection', projection)
+        // lampShader.setMat4('view', view)
+        // let model = glm.mat4.create()
+        // glm.mat4.translate(model, model, lightPos)
+        // glm.mat4.scale(model, model, glm.vec3.fromValues(0.2, 0.2, 0.2))
+        // lampShader.setMat4('model', model)
+        // gl.drawArrays(gl.TRIANGLES, 0, 36)
     }
 
     function animate(timeStamp) {
