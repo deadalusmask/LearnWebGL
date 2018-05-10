@@ -35,7 +35,6 @@ async function init(){
     //capture keyboard input
     let currentlyPressedKeys = {}
 
-
     //capture cursor
     canvas.requestPointerLock = canvas.requestPointerLock ||
                             canvas.mozRequestPointerLock
