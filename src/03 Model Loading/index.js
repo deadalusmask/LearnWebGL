@@ -86,26 +86,6 @@ async function init(){
     var suzanneMesh = new OBJ.Mesh(suzanneObj)
     OBJ.initMeshBuffers(gl, suzanneMesh)
 
-    let VBO = gl.createBuffer()
-    gl.bindBuffer(gl.ARRAY_BUFFER, VBO)
-
-    let aVertexPosition =  gl.getAttribLocation(shader.Program, 'aPos')
-    gl.bindBuffer(gl.ARRAY_BUFFER, suzanneMesh.vertexBuffer)
-    gl.vertexAttribPointer(aVertexPosition, suzanneMesh.vertexBuffer.itemSize, gl.FLOAT, false, 0, 0)
-    gl.enableVertexAttribArray(aVertexPosition)
-
-    if(suzanneMesh.textures.length){
-        let aTexCoord = gl.getAttribLocation(shader.Program, 'aTexCoord')
-        gl.bindBuffer(gl.ARRAY_BUFFER, suzanneMesh.textureBuffer)
-        gl.vertexAttribPointer(aTexCoord, suzanneMesh.textureBuffer.itemSize, gl.FLOAT, false, 0, 0)
-        gl.enableVertexAttribArray(aTexCoord)
-    }
-
-    let aNormal = gl.getAttribLocation(shader.Program, 'aNormal')
-    gl.bindBuffer(gl.ARRAY_BUFFER, suzanneMesh.normalBuffer)
-    gl.vertexAttribPointer(aNormal, suzanneMesh.normalBuffer.itemSize, gl.FLOAT, false, 0, 0)
-    gl.enableVertexAttribArray(aNormal)
-
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true)
 
     let woodTex = await loadImage(wood)
@@ -149,18 +129,36 @@ async function init(){
         glm.mat4.perspective(projection, glm.glMatrix.toRadian(camera.zoom), gl.canvas.clientWidth/gl.canvas.clientHeight, 0.1, 100)
         shader.setMat4('projection', projection)
 
-        let model = glm.mat4.create()
-        shader.setMat4('model', model)
+        if(suzanneMesh) {
+            let aVertexPosition =  gl.getAttribLocation(shader.Program, 'aPos')
+            gl.bindBuffer(gl.ARRAY_BUFFER, suzanneMesh.vertexBuffer)
+            gl.vertexAttribPointer(aVertexPosition, suzanneMesh.vertexBuffer.itemSize, gl.FLOAT, false, 0, 0)
+            gl.enableVertexAttribArray(aVertexPosition)
 
-        let normalMatrix = glm.mat3.create()
-        glm.mat3.fromMat4(normalMatrix, model)
-        glm.mat3.invert(normalMatrix, normalMatrix)
-        glm.mat3.transpose(normalMatrix, normalMatrix)
-        shader.setMat3('normalMatrix', normalMatrix)
+            if(suzanneMesh.textures.length){
+                let aTexCoord = gl.getAttribLocation(shader.Program, 'aTexCoord')
+                gl.bindBuffer(gl.ARRAY_BUFFER, suzanneMesh.textureBuffer)
+                gl.vertexAttribPointer(aTexCoord, suzanneMesh.textureBuffer.itemSize, gl.FLOAT, false, 0, 0)
+                gl.enableVertexAttribArray(aTexCoord)
+            }
 
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, suzanneMesh.indexBuffer)
-        gl.drawElements(gl.TRIANGLES, suzanneMesh.indexBuffer.numItems, gl.UNSIGNED_SHORT, 0)
+            let aNormal = gl.getAttribLocation(shader.Program, 'aNormal')
+            gl.bindBuffer(gl.ARRAY_BUFFER, suzanneMesh.normalBuffer)
+            gl.vertexAttribPointer(aNormal, suzanneMesh.normalBuffer.itemSize, gl.FLOAT, false, 0, 0)
+            gl.enableVertexAttribArray(aNormal)
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, suzanneMesh.indexBuffer)
 
+            let model = glm.mat4.create()
+            shader.setMat4('model', model)
+
+            let normalMatrix = glm.mat3.create()
+            glm.mat3.fromMat4(normalMatrix, model)
+            glm.mat3.invert(normalMatrix, normalMatrix)
+            glm.mat3.transpose(normalMatrix, normalMatrix)
+            shader.setMat3('normalMatrix', normalMatrix)
+
+            gl.drawElements(gl.TRIANGLES, suzanneMesh.indexBuffer.numItems, gl.UNSIGNED_SHORT, 0)
+        }
     }
 
     function animate(timeStamp) {

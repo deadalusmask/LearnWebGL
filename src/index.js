@@ -3,10 +3,14 @@ import * as OBJ from 'webgl-obj-loader'
 
 import Camera from './camera'
 import Shader from './shader'
+
 import vsSource from './03 Model Loading/model_loading.vs'
 import fsSource from './03 Model Loading/model_loading.fs'
 
 import suzanneObj from './assets/suzanne.obj'
+import planeObj from './assets/plane.obj'
+import sphere from './assets/sphere.obj'
+
 import wood from './assets/WoodFineDark004_COL_3K.jpg'
 
 async function init(){
@@ -81,32 +85,13 @@ async function init(){
 
     let shader = new Shader(gl, vsSource, fsSource)
 
-
-    var suzanneMesh = new OBJ.Mesh(suzanneObj)
+    let suzanneMesh = new OBJ.Mesh(suzanneObj)
     OBJ.initMeshBuffers(gl, suzanneMesh)
+    let planeMesh = new OBJ.Mesh(planeObj)
+    OBJ.initMeshBuffers(gl, planeMesh)
 
-    let VBO = gl.createBuffer()
-    gl.bindBuffer(gl.ARRAY_BUFFER, VBO)
-
-    let aVertexPosition =  gl.getAttribLocation(shader.Program, 'aPos')
-    gl.bindBuffer(gl.ARRAY_BUFFER, suzanneMesh.vertexBuffer)
-    gl.vertexAttribPointer(aVertexPosition, suzanneMesh.vertexBuffer.itemSize, gl.FLOAT, false, 0, 0)
-    gl.enableVertexAttribArray(aVertexPosition)
-
-    if(suzanneMesh.textures.length){
-        let aTexCoord = gl.getAttribLocation(shader.Program, 'aTexCoord')
-        gl.bindBuffer(gl.ARRAY_BUFFER, suzanneMesh.textureBuffer)
-        gl.vertexAttribPointer(aTexCoord, suzanneMesh.textureBuffer.itemSize, gl.FLOAT, false, 0, 0)
-        gl.enableVertexAttribArray(aTexCoord)
-    }
-
-    let aNormal = gl.getAttribLocation(shader.Program, 'aNormal')
-    gl.bindBuffer(gl.ARRAY_BUFFER, suzanneMesh.normalBuffer)
-    gl.vertexAttribPointer(aNormal, suzanneMesh.normalBuffer.itemSize, gl.FLOAT, false, 0, 0)
-    gl.enableVertexAttribArray(aNormal)
 
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true)
-
     let woodTex = await loadImage(wood)
     let diffuse = gl.createTexture()
     gl.activeTexture(gl.TEXTURE0)
@@ -115,7 +100,6 @@ async function init(){
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-
 
     shader.use()
     shader.setInt('material.diffuse', 0)
@@ -148,18 +132,72 @@ async function init(){
         glm.mat4.perspective(projection, glm.glMatrix.toRadian(camera.zoom), gl.canvas.clientWidth/gl.canvas.clientHeight, 0.1, 100)
         shader.setMat4('projection', projection)
 
-        let model = glm.mat4.create()
-        shader.setMat4('model', model)
 
-        let normalMatrix = glm.mat3.create()
-        glm.mat3.fromMat4(normalMatrix, model)
-        glm.mat3.invert(normalMatrix, normalMatrix)
-        glm.mat3.transpose(normalMatrix, normalMatrix)
-        shader.setMat3('normalMatrix', normalMatrix)
 
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, suzanneMesh.indexBuffer)
-        gl.drawElements(gl.TRIANGLES, suzanneMesh.indexBuffer.numItems, gl.UNSIGNED_SHORT, 0)
+        if(suzanneMesh) {
+            let aVertexPosition =  gl.getAttribLocation(shader.Program, 'aPos')
+            gl.bindBuffer(gl.ARRAY_BUFFER, suzanneMesh.vertexBuffer)
+            gl.vertexAttribPointer(aVertexPosition, suzanneMesh.vertexBuffer.itemSize, gl.FLOAT, false, 0, 0)
+            gl.enableVertexAttribArray(aVertexPosition)
 
+            if(suzanneMesh.textures.length){
+                let aTexCoord = gl.getAttribLocation(shader.Program, 'aTexCoord')
+                gl.bindBuffer(gl.ARRAY_BUFFER, suzanneMesh.textureBuffer)
+                gl.vertexAttribPointer(aTexCoord, suzanneMesh.textureBuffer.itemSize, gl.FLOAT, false, 0, 0)
+                gl.enableVertexAttribArray(aTexCoord)
+            }
+
+            let aNormal = gl.getAttribLocation(shader.Program, 'aNormal')
+            gl.bindBuffer(gl.ARRAY_BUFFER, suzanneMesh.normalBuffer)
+            gl.vertexAttribPointer(aNormal, suzanneMesh.normalBuffer.itemSize, gl.FLOAT, false, 0, 0)
+            gl.enableVertexAttribArray(aNormal)
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, suzanneMesh.indexBuffer)
+
+            let model = glm.mat4.create()
+            shader.setMat4('model', model)
+
+            let normalMatrix = glm.mat3.create()
+            glm.mat3.fromMat4(normalMatrix, model)
+            glm.mat3.invert(normalMatrix, normalMatrix)
+            glm.mat3.transpose(normalMatrix, normalMatrix)
+            shader.setMat3('normalMatrix', normalMatrix)
+
+            gl.drawElements(gl.TRIANGLES, suzanneMesh.indexBuffer.numItems, gl.UNSIGNED_SHORT, 0)
+        }
+
+
+        if(planeMesh) {
+            let aVertexPosition =  gl.getAttribLocation(shader.Program, 'aPos')
+            gl.bindBuffer(gl.ARRAY_BUFFER, planeMesh.vertexBuffer)
+            gl.vertexAttribPointer(aVertexPosition, planeMesh.vertexBuffer.itemSize, gl.FLOAT, false, 0, 0)
+            gl.enableVertexAttribArray(aVertexPosition)
+
+            if(planeMesh.textures.length){
+                let aTexCoord = gl.getAttribLocation(shader.Program, 'aTexCoord')
+                gl.bindBuffer(gl.ARRAY_BUFFER, planeMesh.textureBuffer)
+                gl.vertexAttribPointer(aTexCoord, planeMesh.textureBuffer.itemSize, gl.FLOAT, false, 0, 0)
+                gl.enableVertexAttribArray(aTexCoord)
+            }
+
+            let aNormal = gl.getAttribLocation(shader.Program, 'aNormal')
+            gl.bindBuffer(gl.ARRAY_BUFFER, planeMesh.normalBuffer)
+            gl.vertexAttribPointer(aNormal, planeMesh.normalBuffer.itemSize, gl.FLOAT, false, 0, 0)
+            gl.enableVertexAttribArray(aNormal)
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, planeMesh.indexBuffer)
+
+            let model = glm.mat4.create()
+            glm.mat4.translate(model, model, glm.vec3.fromValues(0.0, -1.0, 0.0))
+            glm.mat4.scale(model, model, glm.vec3.fromValues(2.0, 2.0, 2.0))
+            shader.setMat4('model', model)
+
+            let normalMatrix = glm.mat3.create()
+            glm.mat3.fromMat4(normalMatrix, model)
+            glm.mat3.invert(normalMatrix, normalMatrix)
+            glm.mat3.transpose(normalMatrix, normalMatrix)
+            shader.setMat3('normalMatrix', normalMatrix)
+
+            gl.drawElements(gl.TRIANGLES, planeMesh.indexBuffer.numItems, gl.UNSIGNED_SHORT, 0)
+        }
     }
 
     function animate(timeStamp) {
