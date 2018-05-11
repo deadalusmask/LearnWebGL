@@ -8,4 +8,6 @@
 + [toji/gl-matrix](https://github.com/toji/gl-matrix)
 + [frenchtoast747/webgl-obj-loader](https://github.com/frenchtoast747/webgl-obj-loader)
 
-demo: [03 Model Loading](https://learnwebgl.arthas.me/demo/03-Model-Loading/index.html)
+demo:
++ [3 Model loading](https://learnwebgl.arthas.me/demo/03-Model-Loading/index.html)
++ [4.2 Stencil testing](https://learnwebgl.arthas.me/demo/04-Advanced-WebGL/02-Stencil-testing/index.html)

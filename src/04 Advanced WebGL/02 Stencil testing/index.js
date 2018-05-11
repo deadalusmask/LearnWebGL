@@ -1,19 +1,19 @@
 import * as glm from 'gl-matrix'
 import * as OBJ from 'webgl-obj-loader'
 
-import Camera from './camera'
-import Shader from './shader'
+import Camera from './../../camera'
+import Shader from './../../shader'
 
-import vsSource from './03 Model Loading/model_loading.vs'
-import fsSource from './03 Model Loading/model_loading.fs'
-import singleColorVsSource from './04 Advanced WebGL/02 Stencil testing/single_color.vs'
-import singleColorFsSource from './04 Advanced WebGL/02 Stencil testing/single_color.fs'
+import vsSource from './../../03 Model Loading/model_loading.vs'
+import fsSource from './../../03 Model Loading/model_loading.fs'
+import singleColorVsSource from './single_color.vs'
+import singleColorFsSource from './single_color.fs'
 
-import suzanneObj from './assets/suzanne.obj'
-import planeObj from './assets/plane.obj'
-import sphereObj from './assets/sphere.obj'
+import suzanneObj from './../../assets/suzanne.obj'
+import planeObj from './../../assets/plane.obj'
+import sphereObj from './../../assets/sphere.obj'
 
-import wood from './assets/WoodFineDark004_COL_3K.jpg'
+import wood from './../../assets/WoodFineDark004_COL_3K.jpg'
 
 async function init(){
     document.body.style.margin = 0
