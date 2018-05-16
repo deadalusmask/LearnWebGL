@@ -1,23 +1,23 @@
 import * as glm from 'gl-matrix'
 import * as OBJ from 'webgl-obj-loader'
 
-import Camera from './camera'
-import Shader from './shader'
+import Camera from './../../camera'
+import Shader from './../../shader'
 
-import vsSource from './03 Model Loading/model_loading.vs'
-import fsSource from './03 Model Loading/model_loading.fs'
-import alphaTexFsSource from './04 Advanced WebGL/03 Blending/alpha_tex.fs'
-import framebufferScreenVsSouece from './04 Advanced WebGL/05 Framebuffers/framebuffers_screen.vs'
-import framebufferScreenFsSouece from './04 Advanced WebGL/05 Framebuffers/framebuffers_screen.fs'
+import vsSource from './../../03 Model Loading/model_loading.vs'
+import fsSource from './../../03 Model Loading/model_loading.fs'
+import alphaTexFsSource from '../03 Blending/alpha_tex.fs'
+import framebufferScreenVsSouece from './framebuffers_screen.vs'
+import framebufferScreenFsSouece from './framebuffers_screen.fs'
 
 
-import suzanneObj from './assets/suzanne.obj'
-import planeObj from './assets/plane.obj'
-import sphereObj from './assets/sphere.obj'
+import suzanneObj from './../../assets/suzanne.obj'
+import planeObj from './../../assets/plane.obj'
+import sphereObj from './../../assets/sphere.obj'
 
-import wood from './assets/WoodFineDark004_COL_3K.jpg'
-import windowSrc from './assets/window.png'
-import grassSrc from './assets/grass.png'
+import wood from './../../assets/WoodFineDark004_COL_3K.jpg'
+import windowSrc from './../../assets/window.png'
+import grassSrc from './../../assets/grass.png'
 
 async function init(){
     document.body.style.margin = 0
