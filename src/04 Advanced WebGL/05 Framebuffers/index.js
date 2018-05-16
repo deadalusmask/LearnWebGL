@@ -206,7 +206,6 @@ async function init(){
         shader.use()
         gl.activeTexture(gl.TEXTURE0)
         gl.bindTexture(gl.TEXTURE_2D, diffuse)
-        //shader.setInt('material.diffuse', 0)
 
         shader.setVec3('viewPos', camera.position)
         shader.setMat4('view', view)
