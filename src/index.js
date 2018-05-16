@@ -157,6 +157,7 @@ async function init(){
     screenShader.use()
     screenShader.setInt('screenTexture', 0)
 
+
     // framebuffer configuration
     let framebuffer = gl.createFramebuffer()
     gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer)
