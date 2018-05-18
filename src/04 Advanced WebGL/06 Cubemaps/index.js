@@ -1,20 +1,19 @@
 import * as glm from 'gl-matrix'
 import * as OBJ from 'webgl-obj-loader'
 
-import Camera from './camera'
-import Shader from './shader'
+import Camera from './../../camera'
+import Shader from './../../shader'
 
-import vsSource from './04 Advanced WebGL/06 Cubemaps/model.vs'
-import fsSource from './04 Advanced WebGL/06 Cubemaps/model.fs'
-import skyboxVsSource from './04 Advanced WebGL/06 Cubemaps/skybox.vs'
-import skyboxFsSource from './04 Advanced WebGL/06 Cubemaps/skybox.fs'
+import vsSource from './model.vs'
+import fsSource from './model.fs'
+import skyboxVsSource from './skybox.vs'
+import skyboxFsSource from './skybox.fs'
 
-import suzanneObj from './assets/suzanne.obj'
+import suzanneObj from './../../assets/suzanne.obj'
 
-import wood from './assets/WoodFineDark004_COL_3K.jpg'
 
 const faces = ['right','left','top','bottom','back','front'].map((element)=>{
-    return require('./assets/skybox/' + element + '.jpg')
+    return require('./../../assets/skybox/' + element + '.jpg')
 })
 
 async function init(){
