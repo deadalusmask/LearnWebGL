@@ -11,8 +11,6 @@ import skyboxFsSource from './04 Advanced WebGL/06 Cubemaps/skybox.fs'
 
 import suzanneObj from './assets/suzanne.obj'
 
-import wood from './assets/WoodFineDark004_COL_3K.jpg'
-
 const faces = ['right','left','top','bottom','back','front'].map((element)=>{
     return require('./assets/skybox/' + element + '.jpg')
 })
@@ -59,13 +57,13 @@ async function init(){
     function handleLockChange() {
         if (document.pointerLockElement === canvas ||
             document.mozPointerLockElement === canvas) {
-            console.log('The pointer lock status is now locked')
+            // console.log('The pointer lock status is now locked')
             document.addEventListener('keydown', handleKeyDown)
             document.addEventListener('keyup', handleKeyUp)
             document.addEventListener('mousemove', mouse_callback)
             document.addEventListener('wheel', wheel_callback)
         } else {
-            console.log('The pointer lock status is now unlocked')
+            // console.log('The pointer lock status is now unlocked')
             document.removeEventListener('mousemove', mouse_callback)
             document.removeEventListener('wheel', wheel_callback)
             document.removeEventListener('keydown', handleKeyDown)
@@ -163,18 +161,8 @@ async function init(){
     gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
     gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
 
-
-    let woodImg = await loadImage(wood)
-    let diffuse = gl.createTexture()
-    gl.activeTexture(gl.TEXTURE0)
-    gl.bindTexture(gl.TEXTURE_2D, diffuse)
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, woodImg)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-
     shader.use()
-    shader.setInt('texture1', 0)
+    shader.setInt('skybox', 0)
 
     skyboxShader.use()
     skyboxShader.setInt('skybox', 0)
