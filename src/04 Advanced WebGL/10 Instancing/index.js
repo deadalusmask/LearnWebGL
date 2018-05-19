@@ -1,17 +1,17 @@
 import * as glm from 'gl-matrix'
 import * as OBJ from 'webgl-obj-loader'
 
-import Camera from './camera'
-import Shader from './shader'
+import Camera from './../../camera'
+import Shader from './../../shader'
 
-import vsSource from './04 Advanced WebGL/10 Instancing/tran.vs'
-import fsSource from './04 Advanced WebGL/10 Instancing/tran.fs'
-import instancedVsSource from './04 Advanced WebGL/10 Instancing/instanced.vs'
+import vsSource from './tran.vs'
+import fsSource from './tran.fs'
+import instancedVsSource from './instanced.vs'
 
-import suzanneObj from './assets/suzanne.obj'
-import sphereObj from './assets/sphere.obj'
+import suzanneObj from './../../assets/suzanne.obj'
+import sphereObj from './../../assets/sphere.obj'
 
-import wood from './assets/WoodFineDark004_COL_3K.jpg'
+import wood from './../../assets/WoodFineDark004_COL_3K.jpg'
 
 async function init(){
     document.body.style.margin = 0
