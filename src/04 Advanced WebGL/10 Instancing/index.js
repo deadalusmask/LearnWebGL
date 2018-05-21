@@ -9,7 +9,6 @@ import fsSource from './tran.fs'
 import instancedVsSource from './instanced.vs'
 
 import suzanneObj from './../../assets/suzanne.obj'
-import sphereObj from './../../assets/sphere.obj'
 
 import wood from './../../assets/WoodFineDark004_COL_3K.jpg'
 

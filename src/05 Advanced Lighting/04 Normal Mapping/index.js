@@ -1,15 +1,15 @@
 import * as glm from 'gl-matrix'
 import * as OBJ from 'webgl-obj-loader'
 
-import Camera from './camera'
-import Shader from './shader'
+import Camera from './../../camera'
+import Shader from './../../shader'
 
-import vsSource from './05 Advanced Lighting/04 Normal Mapping/normal.vs'
-import fsSource from './05 Advanced Lighting/04 Normal Mapping/normal.fs'
+import vsSource from './normal.vs'
+import fsSource from './normal.fs'
 
-import anvilObj from './assets/anvil.obj'
+import anvilObj from './../../assets/anvil.obj'
 
-import normal from './assets/normal.png'
+import normal from './../../assets/normal.png'
 
 async function init(){
     document.body.style.margin = 0
