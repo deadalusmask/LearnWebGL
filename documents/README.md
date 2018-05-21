@@ -13,3 +13,5 @@ demo:
 + [4.2 Stencil testing](https://learnwebgl.arthas.me/demo/04-Advanced-WebGL/02-Stencil-testing/index.html)
 + [4.5 Framebuffers](https://learnwebgl.arthas.me/demo/04-Advanced-WebGL/05-Framebuffers/index.html)
 + [4.6 Cubemaps](https://learnwebgl.arthas.me/demo/04-Advanced-WebGL/06-Cubemaps/index.html)
++ [4.10 Instancing](https://learnwebgl.arthas.me/demo/04-Advanced-WebGL/10-Instancing/index.html)
++ [5.4 Normal Mapping](https://learnwebgl.arthas.me/demo/05-Advanced-Lighting/04-Normal-Mapping/index.html)
