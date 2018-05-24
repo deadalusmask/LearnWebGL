@@ -1,22 +1,22 @@
 import * as glm from 'gl-matrix'
 import * as OBJ from 'webgl-obj-loader'
 
-import Camera from './camera'
-import Shader from './shader'
+import Camera from './../../camera'
+import Shader from './../../shader'
 
-import vsSource from './05 Advanced Lighting/07 Bloom/normal.vs'
-import fsSource from './05 Advanced Lighting/07 Bloom/pointLightWithNormal.fs'
-import lampVsSource from './05 Advanced Lighting/07 Bloom/instancedLamp.vs'
-import lampFsSource from './05 Advanced Lighting/07 Bloom/lamp.fs'
-import blurVsSource from './05 Advanced Lighting/07 Bloom/blur.vs'
-import blurFsSource from './05 Advanced Lighting/07 Bloom/blur.fs'
-import bloomShaderVsSource from './05 Advanced Lighting/07 Bloom/bloom.vs'
-import bloomShaderFsSource from './05 Advanced Lighting/07 Bloom/bloom.fs'
+import vsSource from './normal.vs'
+import fsSource from './pointLightWithNormal.fs'
+import lampVsSource from './instancedLamp.vs'
+import lampFsSource from './lamp.fs'
+import blurVsSource from './blur.vs'
+import blurFsSource from './blur.fs'
+import bloomShaderVsSource from './bloom.vs'
+import bloomShaderFsSource from './bloom.fs'
 
-import anvilObj from './assets/anvil.obj'
-import normal from './assets/normal.png'
+import anvilObj from './../../assets/anvil.obj'
+import normal from './../../assets/normal.png'
 
-import sphereObj from './assets/sphere.obj'
+import sphereObj from './../../assets/sphere.obj'
 
 async function init(){
     document.body.style.margin = 0

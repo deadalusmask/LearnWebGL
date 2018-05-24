@@ -8,16 +8,12 @@ in vec3 a_bitangent;
 
 out vec3 FragPos;
 out vec2 TexCoords;
-out vec3 TangentLightPos;
-out vec3 TangentViewPos;
-out vec3 TangentFragPos;
+out mat3 TBN;
 
 uniform mat4 u_projection;
 uniform mat4 u_view;
 uniform mat4 u_model;
 
-uniform vec3 lightPos;
-uniform vec3 u_viewPos;
 
 void main()
 {
@@ -30,8 +26,5 @@ void main()
     vec3 B = normalize(normalMatrix * a_bitangent);
     vec3 N = normalize(normalMatrix * a_normal);
 
-    mat3 TBN = transpose(mat3(T, B, N));
-    TangentLightPos = TBN * lightPos;
-    TangentViewPos  = TBN * viewPos;
-    TangentFragPos  = TBN * FragPos;
+    TBN = transpose(mat3(T, B, N));
 }
