@@ -1,23 +1,23 @@
 import * as glm from 'gl-matrix'
 import * as OBJ from 'webgl-obj-loader'
 
-import Camera from './camera'
-import Shader from './shader'
+import Camera from './../../camera'
+import Shader from './../../shader'
 
-import gVsSource from './05 Advanced Lighting/08 Deferred Shading/geo.vs'
-import gFsSource from './05 Advanced Lighting/08 Deferred Shading/geo.fs'
-import fbVsSource from './05 Advanced Lighting/08 Deferred Shading/fb.vs'
-import fbFsSource from './05 Advanced Lighting/08 Deferred Shading/fb.fs'
-import lightingPassVsSrc from './05 Advanced Lighting/08 Deferred Shading/deferred_shading.vs'
-import lightingPassFsSrc from './05 Advanced Lighting/08 Deferred Shading/deferred_shading.fs'
+import gVsSource from './geo.vs'
+import gFsSource from './geo.fs'
+import fbVsSource from './fb.vs'
+import fbFsSource from './fb.fs'
+import lightingPassVsSrc from './deferred_shading.vs'
+import lightingPassFsSrc from './deferred_shading.fs'
 
-import lampVsSrc from './05 Advanced Lighting/08 Deferred Shading/lamp.vs'
-import lampFsSrc from './05 Advanced Lighting/08 Deferred Shading/lamp.fs'
+import lampVsSrc from './lamp.vs'
+import lampFsSrc from './lamp.fs'
 
-import anvilObj from './assets/anvil.obj'
-import normal from './assets/normal.png'
+import anvilObj from './../../assets/anvil.obj'
+import normal from './../../assets/normal.png'
 
-import sphereObj from './assets/sphere.obj'
+import sphereObj from './../../assets/sphere.obj'
 
 async function init(){
     document.body.style.margin = 0

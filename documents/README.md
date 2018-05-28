@@ -15,3 +15,5 @@ demo:
 + [4.6 Cubemaps](https://learnwebgl.arthas.me/demo/04-Advanced-WebGL/06-Cubemaps/index.html)
 + [4.10 Instancing](https://learnwebgl.arthas.me/demo/04-Advanced-WebGL/10-Instancing/index.html)
 + [5.4 Normal Mapping](https://learnwebgl.arthas.me/demo/05-Advanced-Lighting/04-Normal-Mapping/index.html)
++ [5.7 Bloom](https://learnwebgl.arthas.me/demo/05-Advanced-Lighting/07-Bloom/index.html)
++ [5.8 Deferred Shading](https://learnwebgl.arthas.me/demo/05-Advanced-Lighting/08-Deferred-Shading/index.html)
