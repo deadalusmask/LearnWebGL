@@ -17,3 +17,4 @@ demo:
 + [5.4 Normal Mapping](https://learnwebgl.arthas.me/demo/05-Advanced-Lighting/04-Normal-Mapping/index.html)
 + [5.7 Bloom](https://learnwebgl.arthas.me/demo/05-Advanced-Lighting/07-Bloom/index.html)
 + [5.8 Deferred Shading](https://learnwebgl.arthas.me/demo/05-Advanced-Lighting/08-Deferred-Shading/index.html)
++ [PBR Direct Lighting](https://learnwebgl.arthas.me/demo/PBR/Lighting/01/index.html)

@@ -4,20 +4,13 @@ import * as OBJ from 'webgl-obj-loader'
 import Camera from './camera'
 import Shader from './shader'
 
-import gVsSource from './05 Advanced Lighting/08 Deferred Shading/geo.vs'
-import gFsSource from './05 Advanced Lighting/08 Deferred Shading/geo.fs'
-import fbVsSource from './05 Advanced Lighting/08 Deferred Shading/fb.vs'
-import fbFsSource from './05 Advanced Lighting/08 Deferred Shading/fb.fs'
-import lightingPassVsSrc from './05 Advanced Lighting/08 Deferred Shading/deferred_shading.vs'
-import lightingPassFsSrc from './05 Advanced Lighting/08 Deferred Shading/deferred_shading.fs'
-
-import lampVsSrc from './05 Advanced Lighting/08 Deferred Shading/lamp.vs'
-import lampFsSrc from './05 Advanced Lighting/08 Deferred Shading/lamp.fs'
-
-import anvilObj from './assets/anvil.obj'
-import normal from './assets/normal.png'
+import vsSource from './PBR/Lighting/pbr.vs'
+import fsSource from './PBR/Lighting/pbr.fs'
 
 import sphereObj from './assets/sphere.obj'
+
+// import normalImg from './assets/rustediron1-alt2-Unreal-Engine/rustediron2_normal.png'
+// import baseColorImg from './assets/rustediron1-alt2-Unreal-Engine/rustediron2_basecolor.png'
 
 async function init(){
     document.body.style.margin = 0
@@ -83,7 +76,7 @@ async function init(){
     }
 
 
-    let gl = canvas.getContext('webgl2', { antialias: false })
+    let gl = canvas.getContext('webgl2')
     if (!gl) {
         console.error('Unable to initialize WebGL. Your browser or machine may not support it.')
         return
@@ -95,106 +88,41 @@ async function init(){
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
     // gl.enable(gl.CULL_FACE)
 
-    let shader = new Shader(gl, gVsSource, gFsSource)
-    let fbShader = new Shader(gl, fbVsSource, fbFsSource)
-    let lightingPassShader = new Shader(gl, lightingPassVsSrc, lightingPassFsSrc)
-    let lampShader = new Shader(gl, lampVsSrc, lampFsSrc)
+    let shader = new Shader(gl, vsSource, fsSource)
 
-    let pointLightLocations = [
-        1.0, 0.2, 4.0,
-        4, 0, 0.0,
-        2.0, 5.0, -2.0,
-        -2.0, 0.0, -2.0,
-        -2.0, 5.0, 5.0
+    let lightPositions = [
+        -10.0,  10.0, 10.0,
+         10.0,  10.0, 10.0,
+        -10.0, -10.0, 10.0,
+         10.0, -10.0, 10.0,
     ]
-    let pointLightColors = [
-        0.5, 0, 1,
-        0, 1, 0,
-        0, 0.5, 1,
-        1, 1, 0,
-        1, 1, 1
-
-    ]
-    let quadVertices = [
-        // positions     // texture Coords
-        -1.0,  1.0, 0.0, 0.0, 1.0,
-        -1.0, -1.0, 0.0, 0.0, 0.0,
-        1.0,  1.0, 0.0, 1.0, 1.0,
-        1.0, -1.0, 0.0, 1.0, 0.0,
+    let lightColors = [
+        300.0, 300.0, 300.0,
+        300.0, 300.0, 300.0,
+        300.0, 300.0, 300.0,
+        300.0, 300.0, 300.0
     ]
 
-    let quadVAO = gl.createVertexArray()
-    let quadVBO = gl.createBuffer()
-    gl.bindVertexArray(quadVAO)
-    gl.bindBuffer(gl.ARRAY_BUFFER, quadVBO)
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(quadVertices), gl.STATIC_DRAW)
-    gl.enableVertexAttribArray(0)
-    gl.vertexAttribPointer(0, 3, gl.FLOAT, true, 20, 0)
-    gl.enableVertexAttribArray(1)
-    gl.vertexAttribPointer(1, 2, gl.FLOAT, true, 20, 12)
-    gl.bindVertexArray(null)
-    gl.bindBuffer(gl.ARRAY_BUFFER, null)
-
-    let anvilMesh = new OBJ.Mesh(anvilObj)
-    anvilMesh.calculateTangentsAndBitangents()
-    OBJ.initMeshBuffers(gl, anvilMesh)
 
     let sphereMesh = new OBJ.Mesh(sphereObj)
+    sphereMesh.calculateTangentsAndBitangents()
     OBJ.initMeshBuffers(gl, sphereMesh)
+
     // Init anvil
     {
-        anvilMesh.a_position = gl.getAttribLocation(shader.Program, 'a_position')
-        anvilMesh.a_texCoord = gl.getAttribLocation(shader.Program, 'a_texCoord')
-        anvilMesh.a_normal = gl.getAttribLocation(shader.Program, 'a_normal')
+        sphereMesh.a_position = gl.getAttribLocation(shader.Program, 'a_position')
+        sphereMesh.a_texCoord = gl.getAttribLocation(shader.Program, 'a_texCoord')
+        sphereMesh.a_normal = gl.getAttribLocation(shader.Program, 'a_normal')
 
-        anvilMesh.a_tangent = gl.getAttribLocation(shader.Program, 'a_tangent')
-        anvilMesh.a_bitangent = gl.getAttribLocation(shader.Program, 'a_bitangent')
+        sphereMesh.a_tangent = gl.getAttribLocation(shader.Program, 'a_tangent')
+        sphereMesh.a_bitangent = gl.getAttribLocation(shader.Program, 'a_bitangent')
 
-        anvilMesh.tengentBuffer = gl.createBuffer()
-        gl.bindBuffer(gl.ARRAY_BUFFER, anvilMesh.tengentBuffer)
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(anvilMesh.tangents), gl.STATIC_DRAW)
-        anvilMesh.bitangentBuffer = gl.createBuffer()
-        gl.bindBuffer(gl.ARRAY_BUFFER, anvilMesh.bitangentBuffer)
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(anvilMesh.bitangents), gl.STATIC_DRAW)
-
-
-        anvilMesh.vao = gl.createVertexArray()
-        gl.bindVertexArray(anvilMesh.vao)
-
-        gl.bindBuffer(gl.ARRAY_BUFFER, anvilMesh.vertexBuffer)
-        gl.vertexAttribPointer(anvilMesh.a_position, 3, gl.FLOAT, false, 0, 0)
-        gl.enableVertexAttribArray(anvilMesh.a_position)
-        gl.bindBuffer(gl.ARRAY_BUFFER, anvilMesh.textureBuffer)
-        gl.vertexAttribPointer(anvilMesh.a_texCoord, 2, gl.FLOAT, false, 0, 0)
-        gl.enableVertexAttribArray(anvilMesh.a_texCoord)
-        gl.bindBuffer(gl.ARRAY_BUFFER, anvilMesh.normalBuffer)
-        gl.vertexAttribPointer(anvilMesh.a_normal, 3, gl.FLOAT, false, 0, 0)
-        gl.enableVertexAttribArray(anvilMesh.a_normal)
-
-        gl.bindBuffer(gl.ARRAY_BUFFER, anvilMesh.tengentBuffer)
-        gl.vertexAttribPointer(anvilMesh.a_tangent, 3, gl.FLOAT, false, 0, 0)
-        gl.enableVertexAttribArray(anvilMesh.a_tangent)
-        gl.bindBuffer(gl.ARRAY_BUFFER, anvilMesh.bitangentBuffer)
-        gl.vertexAttribPointer(anvilMesh.a_bitangent, 3, gl.FLOAT, false, 0, 0)
-        gl.enableVertexAttribArray(anvilMesh.a_bitangent)
-
-        gl.bindVertexArray(null)
-    }
-
-    // Init sphere
-    {
-        sphereMesh.a_position = gl.getAttribLocation(lampShader.Program, 'a_position')
-
-        sphereMesh.a_location = gl.getAttribLocation(lampShader.Program, 'a_location')
-        sphereMesh.a_color = gl.getAttribLocation(lampShader.Program, 'a_color')
-
-        sphereMesh.locationBuffer = gl.createBuffer()
-        gl.bindBuffer(gl.ARRAY_BUFFER, sphereMesh.locationBuffer)
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(pointLightLocations), gl.STATIC_DRAW)
-
-        sphereMesh.colorBuffer = gl.createBuffer()
-        gl.bindBuffer(gl.ARRAY_BUFFER, sphereMesh.colorBuffer)
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(pointLightColors), gl.STATIC_DRAW)
+        // sphereMesh.tengentBuffer = gl.createBuffer()
+        // gl.bindBuffer(gl.ARRAY_BUFFER, sphereMesh.tengentBuffer)
+        // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(sphereMesh.tangents), gl.STATIC_DRAW)
+        // sphereMesh.bitangentBuffer = gl.createBuffer()
+        // gl.bindBuffer(gl.ARRAY_BUFFER, sphereMesh.bitangentBuffer)
+        // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(sphereMesh.bitangents), gl.STATIC_DRAW)
 
 
         sphereMesh.vao = gl.createVertexArray()
@@ -203,81 +131,46 @@ async function init(){
         gl.bindBuffer(gl.ARRAY_BUFFER, sphereMesh.vertexBuffer)
         gl.vertexAttribPointer(sphereMesh.a_position, 3, gl.FLOAT, false, 0, 0)
         gl.enableVertexAttribArray(sphereMesh.a_position)
+        gl.bindBuffer(gl.ARRAY_BUFFER, sphereMesh.textureBuffer)
+        gl.vertexAttribPointer(sphereMesh.a_texCoord, 2, gl.FLOAT, false, 0, 0)
+        gl.enableVertexAttribArray(sphereMesh.a_texCoord)
+        gl.bindBuffer(gl.ARRAY_BUFFER, sphereMesh.normalBuffer)
+        gl.vertexAttribPointer(sphereMesh.a_normal, 3, gl.FLOAT, false, 0, 0)
+        gl.enableVertexAttribArray(sphereMesh.a_normal)
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, sphereMesh.locationBuffer)
-        gl.vertexAttribPointer(sphereMesh.a_location, 3, gl.FLOAT, false, 12, 0)
-        gl.enableVertexAttribArray(sphereMesh.a_location)
-        gl.bindBuffer(gl.ARRAY_BUFFER, sphereMesh.colorBuffer)
-        gl.vertexAttribPointer(sphereMesh.a_color, 3, gl.FLOAT, false, 12, 0)
-        gl.enableVertexAttribArray(sphereMesh.a_color)
-
-        gl.vertexAttribDivisor(sphereMesh.a_location, 1)
-        gl.vertexAttribDivisor(sphereMesh.a_color, 1)
+        // gl.bindBuffer(gl.ARRAY_BUFFER, sphereMesh.tengentBuffer)
+        // gl.vertexAttribPointer(sphereMesh.a_tangent, 3, gl.FLOAT, false, 0, 0)
+        // gl.enableVertexAttribArray(sphereMesh.a_tangent)
+        // gl.bindBuffer(gl.ARRAY_BUFFER, sphereMesh.bitangentBuffer)
+        // gl.vertexAttribPointer(sphereMesh.a_bitangent, 3, gl.FLOAT, false, 0, 0)
+        // gl.enableVertexAttribArray(sphereMesh.a_bitangent)
 
         gl.bindVertexArray(null)
     }
 
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true)
-    let normalImg = await loadImage(normal)
-    let normalmap = gl.createTexture()
-    gl.activeTexture(gl.TEXTURE0)
-    gl.bindTexture(gl.TEXTURE_2D, normalmap)
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, normalImg)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
 
+    // gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true)
+    // let normalImg = await loadImage(normal)
+    // let normalmap = gl.createTexture()
+    // gl.activeTexture(gl.TEXTURE0)
+    // gl.bindTexture(gl.TEXTURE_2D, normalmap)
+    // gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, normalImg)
+    // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+    // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+    // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
 
-    let gBuffer = gl.createFramebuffer()
-    gBuffer.width = gl.canvas.clientWidth
-    gBuffer.height = gl.canvas.clientHeight
-    gl.bindFramebuffer(gl.FRAMEBUFFER, gBuffer)
-
-    let gBufferTexture = []
-    for(let i=0;i<3;i++){
-        gBufferTexture[i] = gl.createTexture()
-        gl.bindTexture(gl.TEXTURE_2D, gBufferTexture[i])
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gBuffer.width, gBuffer.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null)
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + i, gl.TEXTURE_2D, gBufferTexture[i], 0)
-    }
-
-    let attachments = [gl.COLOR_ATTACHMENT0, gl.COLOR_ATTACHMENT1, gl.COLOR_ATTACHMENT2]
-    gl.drawBuffers(attachments)
-
-    let renderbuffer = gl.createRenderbuffer()
-    gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer)
-    gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, gBuffer.width, gBuffer.height)
-    gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderbuffer)
-
-    if(gl.checkFramebufferStatus(gl.FRAMEBUFFER) != gl.FRAMEBUFFER_COMPLETE){
-        console.error('framebuffer not complete')
-    }
-
-
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null)
-
-    // 1
+    let nrRows = 7
+    let nrColumns = 7
+    let spacing = 2.5
 
     shader.use()
-    shader.setInt('normalMap', 0)
-    shader.setFloat('material.shininess', 1.0)
-    shader.setVec3('material.diffuseColor', [0.69,0.75,0.77])
+    shader.setVec3('albedo', [0.5, 0.0, 0.0])
+    shader.setFloat('ao', 1.0)
 
-    lightingPassShader.use()
-    lightingPassShader.setInt('gPosition', 0)
-    lightingPassShader.setInt('gNormal', 1)
-    lightingPassShader.setInt('gAlbedoSpec', 2)
+    let projection = glm.mat4.create()
+    glm.mat4.perspective(projection, glm.glMatrix.toRadian(camera.zoom), gl.canvas.clientWidth/gl.canvas.clientHeight, 0.1, 100)
+    shader.setMat4('u_projection', projection)
 
-    for(let i=0;i<5;i++){
-        lightingPassShader.setVec3('lights['+i+'].position', pointLightLocations.slice(i*3,i*3+3))
-        lightingPassShader.setVec3('lights['+i+'].color', pointLightColors.slice(i*3,i*3+3))
-        lightingPassShader.setFloat('lights['+i+'].linear', 0.09)
-        lightingPassShader.setFloat('lights['+i+'].quadratic', 0.032)
-    }
 
     animate()
 
@@ -285,73 +178,49 @@ async function init(){
         gl.clearColor(0, 0, 0, 1.0)
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
-        gl.bindFramebuffer(gl.FRAMEBUFFER, gBuffer)
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
         let view = camera.getViewMatrix()
-        let projection = glm.mat4.create()
-        glm.mat4.perspective(projection, glm.glMatrix.toRadian(camera.zoom), gl.canvas.clientWidth/gl.canvas.clientHeight, 0.1, 100)
 
         shader.use()
         shader.setMat4('u_view', view)
-        shader.setMat4('u_projection', projection)
+        shader.setVec3('camPos', camera.position)
 
-        gl.activeTexture(gl.TEXTURE0)
-        gl.bindTexture(gl.TEXTURE_2D, normalmap)
+        gl.bindVertexArray(sphereMesh.vao)
+        for(let row=0;row<nrRows;++row){
+            shader.setFloat('metallic', row/nrRows)
+            for(let col=0;col<nrColumns;++col){
+                shader.setFloat('roughness', Math.min(Math.max(col/nrColumns, 0.05), 1.0))
 
-        gl.bindVertexArray(anvilMesh.vao)
-
-        let model = glm.mat4.create()
-        glm.mat4.translate(model, model, [0,-1,0])
-        // glm.mat4.rotate(model, model, 180, [1,0,0])
-        shader.setMat4('u_model', model)
-
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, anvilMesh.indexBuffer)
-        gl.drawElements(gl.TRIANGLES, anvilMesh.indexBuffer.numItems, gl.UNSIGNED_SHORT, 0)
-        gl.bindVertexArray(null)
-
-        gl.bindFramebuffer(gl.FRAMEBUFFER, null)
-
-        // // g buffer test
-        // {
-        //     fbShader.use()
-        //     gl.activeTexture(gl.TEXTURE0)
-        //     gl.bindTexture(gl.TEXTURE_2D, gBufferTexture[1])
-
-        //     gl.bindVertexArray(quadVAO)
-        //     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
-        //     gl.bindVertexArray(null)
-        // }
-
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-        lightingPassShader.use()
-        for(let i=0;i<3;i++){
-            gl.activeTexture(gl.TEXTURE0+i)
-            gl.bindTexture(gl.TEXTURE_2D, gBufferTexture[i])
+                let model = glm.mat4.create()
+                glm.mat4.translate(model, model, [
+                    (col-(nrColumns/2)) * spacing,
+                    (row-(nrRows/2)) * spacing,
+                    0
+                ])
+                shader.setMat4('u_model', model)
+                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, sphereMesh.indexBuffer)
+                gl.drawElements(gl.TRIANGLES, sphereMesh.indexBuffer.numItems, gl.UNSIGNED_SHORT, 0)
+            }
         }
-
-        lightingPassShader.setVec3('u_viewPos', camera.position)
-
-        gl.bindVertexArray(quadVAO)
-        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
         gl.bindVertexArray(null)
 
-        gl.bindFramebuffer(gl.READ_FRAMEBUFFER, gBuffer)
-        gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, null)
-        gl.blitFramebuffer(0, 0, gBuffer.width, gBuffer.height, 0, 0, gBuffer.width, gBuffer.height, gl.DEPTH_BUFFER_BIT, gl.NEAREST)
-        gl.bindFramebuffer(gl.FRAMEBUFFER, null)
 
-        // draw lamps
-        {
-            lampShader.use()
-            lampShader.setMat4('u_view', view)
-            lampShader.setMat4('u_projection', projection)
-            gl.bindVertexArray(sphereMesh.vao)
+        // gl.activeTexture(gl.TEXTURE0)
+        // gl.bindTexture(gl.TEXTURE_2D, normalmap)
+
+        gl.bindVertexArray(sphereMesh.vao)
+        for(let i=0;i<lightPositions.length;++i){
+            let newPos = lightPositions.slice(i*3,i*3+3)
+            //glm.vec3.add(newPos, lightPositions.slice(i*3,i*3+3), [5, 0, 0])
+            shader.setVec3('lightPositions['+i+']', newPos)
+            shader.setVec3('lightColors['+i+']', lightColors.slice(i*3,i*3+3))
             let model = glm.mat4.create()
-            glm.mat4.scale(model, model, [0.2,0.2,0.2])
-            lampShader.setMat4('u_model', model)
+            glm.mat4.translate(model, model, newPos)
+            glm.mat4.scale(model, model, 0.1)
+            shader.setMat4('u_model', model)
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, sphereMesh.indexBuffer)
-            gl.drawElementsInstanced(gl.TRIANGLES, sphereMesh.indexBuffer.numItems, gl.UNSIGNED_SHORT, 0, 5)
+            gl.drawElements(gl.TRIANGLES, sphereMesh.indexBuffer.numItems, gl.UNSIGNED_SHORT, 0)
         }
+        gl.bindVertexArray(null)
 
 
     }
