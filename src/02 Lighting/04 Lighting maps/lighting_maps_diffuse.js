@@ -9,266 +9,266 @@ import lampFsSource from './../01 Colors/lamp.fs'
 
 import box from './../../assets/box.png'
 
-async function init(){
-    document.body.style.margin = 0
-    document.body.style.overflow = 'hidden'
-    let canvas = document.createElement('canvas')
+async function init() {
+  document.body.style.margin = 0
+  document.body.style.overflow = 'hidden'
+  let canvas = document.createElement('canvas')
+  canvas.width = window.innerWidth
+  canvas.height = window.innerHeight
+  document.body.appendChild(canvas)
+
+  // camera
+  let camera = new Camera(glm.vec3.fromValues(0.0, 0.0, 5.0))
+
+  // timting
+  let deltaTime = 0
+  let lastFrame = 0
+
+  // lighting
+  let lightPos = glm.vec3.fromValues(1.2, 1.0, 2.0)
+
+  // resize window
+  window.onresize = function () {
     canvas.width = window.innerWidth
     canvas.height = window.innerHeight
-    document.body.appendChild(canvas)
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
+    drawScene()
+  }
 
-    // camera
-    let camera = new Camera(glm.vec3.fromValues(0.0,  0.0, 5.0))
+  //capture keyboard input
+  let currentlyPressedKeys = {}
 
-    // timting
-    let deltaTime = 0
-    let lastFrame = 0
 
-    // lighting
-    let lightPos = glm.vec3.fromValues(1.2, 1.0, 2.0)
+  //capture cursor
+  canvas.requestPointerLock = canvas.requestPointerLock ||
+    canvas.mozRequestPointerLock
+  document.exitPointerLock = document.exitPointerLock ||
+    document.mozExitPointerLock
+  canvas.onclick = function () {
+    canvas.requestPointerLock()
+  }
 
-    // resize window
-    window.onresize = function(){
-        canvas.width = window.innerWidth
-        canvas.height = window.innerHeight
-        gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
-        drawScene()
+  document.addEventListener('pointerlockchange', handleLockChange, false)
+  document.addEventListener('mozpointerlockchange', handleLockChange, false)
+
+  function handleLockChange() {
+    if (document.pointerLockElement === canvas ||
+      document.mozPointerLockElement === canvas) {
+      console.log('The pointer lock status is now locked')
+      document.addEventListener('keydown', handleKeyDown)
+      document.addEventListener('keyup', handleKeyUp)
+      document.addEventListener('mousemove', mouse_callback)
+      document.addEventListener('wheel', wheel_callback)
+    } else {
+      console.log('The pointer lock status is now unlocked')
+      document.removeEventListener('mousemove', mouse_callback)
+      document.removeEventListener('wheel', wheel_callback)
+      document.removeEventListener('keydown', handleKeyDown)
+      document.removeEventListener('keyup', handleKeyUp)
     }
+  }
 
-    //capture keyboard input
-    let currentlyPressedKeys = {}
-
-
-    //capture cursor
-    canvas.requestPointerLock = canvas.requestPointerLock ||
-                            canvas.mozRequestPointerLock
-    document.exitPointerLock = document.exitPointerLock ||
-                            document.mozExitPointerLock
-    canvas.onclick = function() {
-        canvas.requestPointerLock()
-    }
-
-    document.addEventListener('pointerlockchange', handleLockChange, false)
-    document.addEventListener('mozpointerlockchange', handleLockChange, false)
-
-    function handleLockChange() {
-        if (document.pointerLockElement === canvas ||
-            document.mozPointerLockElement === canvas) {
-            console.log('The pointer lock status is now locked')
-            document.addEventListener('keydown', handleKeyDown)
-            document.addEventListener('keyup', handleKeyUp)
-            document.addEventListener('mousemove', mouse_callback)
-            document.addEventListener('wheel', wheel_callback)
-        } else {
-            console.log('The pointer lock status is now unlocked')
-            document.removeEventListener('mousemove', mouse_callback)
-            document.removeEventListener('wheel', wheel_callback)
-            document.removeEventListener('keydown', handleKeyDown)
-            document.removeEventListener('keyup', handleKeyUp)
-        }
-    }
-
-    function handleKeyDown(event) {
-        currentlyPressedKeys[event.key] = true
-    }
-    function handleKeyUp(event) {
-        currentlyPressedKeys[event.key] = false
-    }
+  function handleKeyDown(event) {
+    currentlyPressedKeys[event.key] = true
+  }
+  function handleKeyUp(event) {
+    currentlyPressedKeys[event.key] = false
+  }
 
 
-    let gl = canvas.getContext('webgl')
-    if (!gl) {
-        console.error('Unable to initialize WebGL. Your browser or machine may not support it.')
-        return
-    }
-    gl.enable(gl.DEPTH_TEST)
+  let gl = canvas.getContext('webgl')
+  if (!gl) {
+    console.error('Unable to initialize WebGL. Your browser or machine may not support it.')
+    return
+  }
+  gl.enable(gl.DEPTH_TEST)
 
-    let shader = new Shader(gl, vsSource, fsSource)
-    let lampShader = new Shader(gl, lampVsSource, lampFsSource)
+  let shader = new Shader(gl, vsSource, fsSource)
+  let lampShader = new Shader(gl, lampVsSource, lampFsSource)
 
-    let vertices = [
+  let vertices = [
     // positions       // normals        // texture coords
-    -0.5, -0.5, -0.5,  0.0,  0.0, -1.0,  0.0, 0.0,
-     0.5, -0.5, -0.5,  0.0,  0.0, -1.0,  1.0, 0.0,
-     0.5,  0.5, -0.5,  0.0,  0.0, -1.0,  1.0, 1.0,
-     0.5,  0.5, -0.5,  0.0,  0.0, -1.0,  1.0, 1.0,
-    -0.5,  0.5, -0.5,  0.0,  0.0, -1.0,  0.0, 1.0,
-    -0.5, -0.5, -0.5,  0.0,  0.0, -1.0,  0.0, 0.0,
+    -0.5, -0.5, -0.5, 0.0, 0.0, -1.0, 0.0, 0.0,
+    0.5, -0.5, -0.5, 0.0, 0.0, -1.0, 1.0, 0.0,
+    0.5, 0.5, -0.5, 0.0, 0.0, -1.0, 1.0, 1.0,
+    0.5, 0.5, -0.5, 0.0, 0.0, -1.0, 1.0, 1.0,
+    -0.5, 0.5, -0.5, 0.0, 0.0, -1.0, 0.0, 1.0,
+    -0.5, -0.5, -0.5, 0.0, 0.0, -1.0, 0.0, 0.0,
 
-    -0.5, -0.5,  0.5,  0.0,  0.0,  1.0,  0.0, 0.0,
-     0.5, -0.5,  0.5,  0.0,  0.0,  1.0,  1.0, 0.0,
-     0.5,  0.5,  0.5,  0.0,  0.0,  1.0,  1.0, 1.0,
-     0.5,  0.5,  0.5,  0.0,  0.0,  1.0,  1.0, 1.0,
-    -0.5,  0.5,  0.5,  0.0,  0.0,  1.0,  0.0, 1.0,
-    -0.5, -0.5,  0.5,  0.0,  0.0,  1.0,  0.0, 0.0,
+    -0.5, -0.5, 0.5, 0.0, 0.0, 1.0, 0.0, 0.0,
+    0.5, -0.5, 0.5, 0.0, 0.0, 1.0, 1.0, 0.0,
+    0.5, 0.5, 0.5, 0.0, 0.0, 1.0, 1.0, 1.0,
+    0.5, 0.5, 0.5, 0.0, 0.0, 1.0, 1.0, 1.0,
+    -0.5, 0.5, 0.5, 0.0, 0.0, 1.0, 0.0, 1.0,
+    -0.5, -0.5, 0.5, 0.0, 0.0, 1.0, 0.0, 0.0,
 
-    -0.5,  0.5,  0.5, -1.0,  0.0,  0.0,  1.0, 0.0,
-    -0.5,  0.5, -0.5, -1.0,  0.0,  0.0,  1.0, 1.0,
-    -0.5, -0.5, -0.5, -1.0,  0.0,  0.0,  0.0, 1.0,
-    -0.5, -0.5, -0.5, -1.0,  0.0,  0.0,  0.0, 1.0,
-    -0.5, -0.5,  0.5, -1.0,  0.0,  0.0,  0.0, 0.0,
-    -0.5,  0.5,  0.5, -1.0,  0.0,  0.0,  1.0, 0.0,
+    -0.5, 0.5, 0.5, -1.0, 0.0, 0.0, 1.0, 0.0,
+    -0.5, 0.5, -0.5, -1.0, 0.0, 0.0, 1.0, 1.0,
+    -0.5, -0.5, -0.5, -1.0, 0.0, 0.0, 0.0, 1.0,
+    -0.5, -0.5, -0.5, -1.0, 0.0, 0.0, 0.0, 1.0,
+    -0.5, -0.5, 0.5, -1.0, 0.0, 0.0, 0.0, 0.0,
+    -0.5, 0.5, 0.5, -1.0, 0.0, 0.0, 1.0, 0.0,
 
-     0.5,  0.5,  0.5,  1.0,  0.0,  0.0,  1.0, 0.0,
-     0.5,  0.5, -0.5,  1.0,  0.0,  0.0,  1.0, 1.0,
-     0.5, -0.5, -0.5,  1.0,  0.0,  0.0,  0.0, 1.0,
-     0.5, -0.5, -0.5,  1.0,  0.0,  0.0,  0.0, 1.0,
-     0.5, -0.5,  0.5,  1.0,  0.0,  0.0,  0.0, 0.0,
-     0.5,  0.5,  0.5,  1.0,  0.0,  0.0,  1.0, 0.0,
+    0.5, 0.5, 0.5, 1.0, 0.0, 0.0, 1.0, 0.0,
+    0.5, 0.5, -0.5, 1.0, 0.0, 0.0, 1.0, 1.0,
+    0.5, -0.5, -0.5, 1.0, 0.0, 0.0, 0.0, 1.0,
+    0.5, -0.5, -0.5, 1.0, 0.0, 0.0, 0.0, 1.0,
+    0.5, -0.5, 0.5, 1.0, 0.0, 0.0, 0.0, 0.0,
+    0.5, 0.5, 0.5, 1.0, 0.0, 0.0, 1.0, 0.0,
 
-    -0.5, -0.5, -0.5,  0.0, -1.0,  0.0,  0.0, 1.0,
-     0.5, -0.5, -0.5,  0.0, -1.0,  0.0,  1.0, 1.0,
-     0.5, -0.5,  0.5,  0.0, -1.0,  0.0,  1.0, 0.0,
-     0.5, -0.5,  0.5,  0.0, -1.0,  0.0,  1.0, 0.0,
-    -0.5, -0.5,  0.5,  0.0, -1.0,  0.0,  0.0, 0.0,
-    -0.5, -0.5, -0.5,  0.0, -1.0,  0.0,  0.0, 1.0,
+    -0.5, -0.5, -0.5, 0.0, -1.0, 0.0, 0.0, 1.0,
+    0.5, -0.5, -0.5, 0.0, -1.0, 0.0, 1.0, 1.0,
+    0.5, -0.5, 0.5, 0.0, -1.0, 0.0, 1.0, 0.0,
+    0.5, -0.5, 0.5, 0.0, -1.0, 0.0, 1.0, 0.0,
+    -0.5, -0.5, 0.5, 0.0, -1.0, 0.0, 0.0, 0.0,
+    -0.5, -0.5, -0.5, 0.0, -1.0, 0.0, 0.0, 1.0,
 
-    -0.5,  0.5, -0.5,  0.0,  1.0,  0.0,  0.0, 1.0,
-     0.5,  0.5, -0.5,  0.0,  1.0,  0.0,  1.0, 1.0,
-     0.5,  0.5,  0.5,  0.0,  1.0,  0.0,  1.0, 0.0,
-     0.5,  0.5,  0.5,  0.0,  1.0,  0.0,  1.0, 0.0,
-    -0.5,  0.5,  0.5,  0.0,  1.0,  0.0,  0.0, 0.0,
-    -0.5,  0.5, -0.5,  0.0,  1.0,  0.0,  0.0, 1.0
-    ]
+    -0.5, 0.5, -0.5, 0.0, 1.0, 0.0, 0.0, 1.0,
+    0.5, 0.5, -0.5, 0.0, 1.0, 0.0, 1.0, 1.0,
+    0.5, 0.5, 0.5, 0.0, 1.0, 0.0, 1.0, 0.0,
+    0.5, 0.5, 0.5, 0.0, 1.0, 0.0, 1.0, 0.0,
+    -0.5, 0.5, 0.5, 0.0, 1.0, 0.0, 0.0, 0.0,
+    -0.5, 0.5, -0.5, 0.0, 1.0, 0.0, 0.0, 1.0
+  ]
 
-    let VBO = gl.createBuffer()
-    gl.bindBuffer(gl.ARRAY_BUFFER, VBO)
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW)
+  let VBO = gl.createBuffer()
+  gl.bindBuffer(gl.ARRAY_BUFFER, VBO)
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW)
 
-    let aVertexPosition = gl.getAttribLocation(shader.Program, 'aPos')
-    gl.vertexAttribPointer(aVertexPosition, 3, gl.FLOAT, true, 32, 0)
-    gl.enableVertexAttribArray(aVertexPosition)
+  let aVertexPosition = gl.getAttribLocation(shader.Program, 'aPos')
+  gl.vertexAttribPointer(aVertexPosition, 3, gl.FLOAT, true, 32, 0)
+  gl.enableVertexAttribArray(aVertexPosition)
 
-    let aNormal = gl.getAttribLocation(shader.Program, 'aNormal')
-    gl.vertexAttribPointer(aNormal, 3, gl.FLOAT, true, 32, 12)
-    gl.enableVertexAttribArray(aNormal)
+  let aNormal = gl.getAttribLocation(shader.Program, 'aNormal')
+  gl.vertexAttribPointer(aNormal, 3, gl.FLOAT, true, 32, 12)
+  gl.enableVertexAttribArray(aNormal)
 
-    let aTexCoord = gl.getAttribLocation(shader.Program, 'aTexCoord')
-    gl.vertexAttribPointer(aTexCoord, 2, gl.FLOAT, true, 32, 24)
-    gl.enableVertexAttribArray(aTexCoord)
+  let aTexCoord = gl.getAttribLocation(shader.Program, 'aTexCoord')
+  gl.vertexAttribPointer(aTexCoord, 2, gl.FLOAT, true, 32, 24)
+  gl.enableVertexAttribArray(aTexCoord)
 
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true)
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true)
 
-    let BoxDiffuse = await loadImage(box)
-    let diffuse = gl.createTexture()
-    gl.activeTexture(gl.TEXTURE0)
-    gl.bindTexture(gl.TEXTURE_2D, diffuse)
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, BoxDiffuse)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
+  let BoxDiffuse = await loadImage(box)
+  let diffuse = gl.createTexture()
+  gl.activeTexture(gl.TEXTURE0)
+  gl.bindTexture(gl.TEXTURE_2D, diffuse)
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, BoxDiffuse)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
+
+  shader.use()
+  shader.setInt('material.diffuse', 0)
+
+  animate()
+
+  function drawScene(timeStamp) {
+    gl.clearColor(0.1, 0.1, 0.1, 1.0)
+    gl.clear(gl.COLOR_BUFFER_BIT)
 
     shader.use()
-    shader.setInt('material.diffuse', 0)
 
-    animate()
+    shader.setVec3('light.position', lightPos)
+    shader.setVec3('viewPos', camera.position)
 
-    function drawScene(timeStamp) {
-        gl.clearColor(0.1, 0.1, 0.1, 1.0)
-        gl.clear(gl.COLOR_BUFFER_BIT)
+    // light properties
+    shader.setVec3('light.ambient', glm.vec3.fromValues(0.2, 0.2, 0.2))
+    shader.setVec3('light.diffuse', glm.vec3.fromValues(0.5, 0.5, 0.5))
+    shader.setVec3('light.specular', glm.vec3.fromValues(1.0, 1.0, 1.0))
 
-        shader.use()
+    // material properties
 
-        shader.setVec3('light.position', lightPos)
-        shader.setVec3('viewPos', camera.position)
+    gl.activeTexture(gl.TEXTURE0)
+    gl.bindTexture(gl.TEXTURE_2D, texture1)
 
-        // light properties
-        shader.setVec3('light.ambient', glm.vec3.fromValues(0.2, 0.2, 0.2))
-        shader.setVec3('light.diffuse', glm.vec3.fromValues(0.5, 0.5, 0.5))
-        shader.setVec3('light.specular', glm.vec3.fromValues(1.0, 1.0, 1.0))
+    shader.setVec3('material.specular', glm.vec3.fromValues(0.5, 0.5, 0.5))
+    shader.setFloat('material.shininess', 32.0)
 
-        // material properties
+    let view = camera.getViewMatrix()
+    shader.setMat4('view', view)
 
-        gl.activeTexture(gl.TEXTURE0)
-        gl.bindTexture(gl.TEXTURE_2D, texture1)
+    let projection = glm.mat4.create()
+    glm.mat4.perspective(projection, glm.glMatrix.toRadian(camera.zoom), gl.canvas.clientWidth / gl.canvas.clientHeight, 0.1, 100)
+    shader.setMat4('projection', projection)
 
-        shader.setVec3('material.specular', glm.vec3.fromValues(0.5, 0.5, 0.5))
-        shader.setFloat('material.shininess', 32.0)
+    let model = glm.mat4.create()
+    //glm.mat4.rotate(model, model, glm.glMatrix.toRadian(Date.now()*0.03), glm.vec3.fromValues(0.1, 0.3, 0.5))
+    shader.setMat4('model', model)
 
-        let view = camera.getViewMatrix()
-        shader.setMat4('view', view)
+    let normalMatrix = glm.mat3.create()
+    glm.mat3.fromMat4(normalMatrix, model)
+    glm.mat3.invert(normalMatrix, normalMatrix)
+    glm.mat3.transpose(normalMatrix, normalMatrix)
+    shader.setMat3('normalMatrix', normalMatrix)
 
-        let projection = glm.mat4.create()
-        glm.mat4.perspective(projection, glm.glMatrix.toRadian(camera.zoom), gl.canvas.clientWidth/gl.canvas.clientHeight, 0.1, 100)
-        shader.setMat4('projection', projection)
+    gl.drawArrays(gl.TRIANGLES, 0, 36)
 
-        let model = glm.mat4.create()
-        //glm.mat4.rotate(model, model, glm.glMatrix.toRadian(Date.now()*0.03), glm.vec3.fromValues(0.1, 0.3, 0.5))
-        shader.setMat4('model', model)
+    lampShader.use()
+    lampShader.setMat4('projection', projection)
+    lampShader.setMat4('view', view)
+    model = glm.mat4.create()
+    glm.mat4.translate(model, model, lightPos)
+    glm.mat4.scale(model, model, glm.vec3.fromValues(0.2, 0.2, 0.2))
+    lampShader.setMat4('model', model)
+    gl.drawArrays(gl.TRIANGLES, 0, 36)
+  }
 
-        let normalMatrix = glm.mat3.create()
-        glm.mat3.fromMat4(normalMatrix, model)
-        glm.mat3.invert(normalMatrix, normalMatrix)
-        glm.mat3.transpose(normalMatrix, normalMatrix)
-        shader.setMat3('normalMatrix', normalMatrix)
+  function animate(timeStamp) {
+    let currentFrame = timeStamp
+    deltaTime = currentFrame - lastFrame
+    lastFrame = currentFrame
 
-        gl.drawArrays(gl.TRIANGLES, 0, 36)
+    processInput()
 
-        lampShader.use()
-        lampShader.setMat4('projection', projection)
-        lampShader.setMat4('view', view)
-        model = glm.mat4.create()
-        glm.mat4.translate(model, model, lightPos)
-        glm.mat4.scale(model, model, glm.vec3.fromValues(0.2, 0.2, 0.2))
-        lampShader.setMat4('model', model)
-        gl.drawArrays(gl.TRIANGLES, 0, 36)
+    drawScene(timeStamp)
+    requestAnimationFrame(animate)
+  }
+
+  function processInput() {
+
+    if (currentlyPressedKeys['w']) {
+      camera.processKeyboard(Camera.Movement.FORWARD, deltaTime)
+    }
+    if (currentlyPressedKeys['s']) {
+      camera.processKeyboard(Camera.Movement.BACKWARD, deltaTime)
+    }
+    if (currentlyPressedKeys['a']) {
+      camera.processKeyboard(Camera.Movement.LEFT, deltaTime)
+    }
+    if (currentlyPressedKeys['d']) {
+      camera.processKeyboard(Camera.Movement.RIGHT, deltaTime)
+    }
+    if (currentlyPressedKeys[' ']) {
+      camera.processKeyboard(Camera.Movement.UP, deltaTime)
+    }
+    if (currentlyPressedKeys['Control']) {
+      camera.processKeyboard(Camera.Movement.DOWN, deltaTime)
     }
 
-    function animate(timeStamp) {
-        let currentFrame = timeStamp
-        deltaTime = currentFrame - lastFrame
-        lastFrame = currentFrame
+  }
 
-        processInput()
+  function mouse_callback(e) {
+    let xoffset = e.movementX
+    let yoffset = -e.movementY
+    camera.processMouseMovement(xoffset, yoffset)
+  }
 
-        drawScene(timeStamp)
-        requestAnimationFrame(animate)
-    }
-
-    function processInput() {
-
-        if(currentlyPressedKeys['w']){
-            camera.processKeyboard(Camera.Movement.FORWARD, deltaTime)
-        }
-        if(currentlyPressedKeys['s']){
-            camera.processKeyboard(Camera.Movement.BACKWARD, deltaTime)
-        }
-        if(currentlyPressedKeys['a']){
-            camera.processKeyboard(Camera.Movement.LEFT, deltaTime)
-        }
-        if(currentlyPressedKeys['d']){
-            camera.processKeyboard(Camera.Movement.RIGHT, deltaTime)
-        }
-        if(currentlyPressedKeys[' ']){
-            camera.processKeyboard(Camera.Movement.UP, deltaTime)
-        }
-        if(currentlyPressedKeys['Control']){
-            camera.processKeyboard(Camera.Movement.DOWN, deltaTime)
-        }
-
-    }
-
-    function mouse_callback(e) {
-        let xoffset = e.movementX
-        let yoffset = -e.movementY
-        camera.processMouseMovement(xoffset, yoffset)
-    }
-
-    function wheel_callback(e) {
-        //console.log(e.wheelDeltaY)
-        camera.processMouseScroll(e.wheelDeltaY)
-    }
+  function wheel_callback(e) {
+    //console.log(e.wheelDeltaY)
+    camera.processMouseScroll(e.wheelDeltaY)
+  }
 
 }
 
-function loadImage(src){
-    return new Promise((resolve, reject) => {
-      let img = new Image()
-      img.onload = () => resolve(img)
-      img.onerror = reject
-      img.src = src
-    })
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    let img = new Image()
+    img.onload = () => resolve(img)
+    img.onerror = reject
+    img.src = src
+  })
 }
 
 init()
